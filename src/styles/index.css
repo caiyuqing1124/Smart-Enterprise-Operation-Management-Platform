@@ -55,3 +55,13 @@ a { color: var(--primary); text-decoration: none; }
   .auth-page { grid-template-columns: 1fr 1fr; }.visual-content { padding-inline: 48px; }.visual-metrics { gap: 12px; }
   .global-search { width: 220px; }
 }
+
+.main-menu .el-sub-menu__title { height: 46px; color: #aebcd1; border-radius: 8px; }
+.main-menu .el-sub-menu__title:hover { color: #fff; background: rgba(255,255,255,.07); }
+.main-menu .el-sub-menu .el-menu { background: transparent; }
+.main-menu .el-sub-menu .el-menu-item { min-width: 0; padding-left: 46px !important; font-size: 12px; }
+.sidebar.collapsed .main-menu { padding: 0 10px; }
+.notification-item { width: 100%; text-align: left; border: 0; border-bottom: 1px solid #edf1f6; background: transparent; cursor: pointer; }
+.notification-item:hover { background: #f7f9fc; }
+.notification-item p { color: #26344b; }
+.notification-more { width: 100%; margin-top: 10px; }

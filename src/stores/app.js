@@ -1,12 +1,12 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
+import { initialNotifications } from '../mock/workbench'
+
+const clone = (value) => JSON.parse(JSON.stringify(value))
 
 export const useAppStore = defineStore('app', () => {
   const sidebarCollapsed = ref(false)
-  const notifications = ref([
-    { id: 1, title: '欢迎使用智慧企业运营管理平台', time: '刚刚', read: false },
-    { id: 2, title: '账号安全设置已启用', time: '刚刚', read: false },
-  ])
+  const notifications = ref(clone(initialNotifications))
 
   function toggleSidebar() {
     sidebarCollapsed.value = !sidebarCollapsed.value
@@ -16,5 +16,14 @@ export const useAppStore = defineStore('app', () => {
     notifications.value = notifications.value.map((item) => ({ ...item, read: true }))
   }
 
-  return { sidebarCollapsed, notifications, toggleSidebar, markAllRead }
+  function markRead(id) {
+    const notification = notifications.value.find((item) => item.id === id)
+    if (notification) notification.read = true
+  }
+
+  function removeNotifications(ids) {
+    notifications.value = notifications.value.filter((item) => !ids.includes(item.id))
+  }
+
+  return { sidebarCollapsed, notifications, toggleSidebar, markAllRead, markRead, removeNotifications }
 })

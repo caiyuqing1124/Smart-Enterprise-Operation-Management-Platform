@@ -25,9 +25,25 @@ const routes = [
     children: [
       {
         path: '',
-        name: 'home',
-        component: () => import('../views/home/HomeView.vue'),
-        meta: { title: '工作台' },
+        redirect: '/workbench/operations',
+      },
+      {
+        path: 'workbench/operations',
+        name: 'operations-workbench',
+        component: () => import('../views/workbench/OperationsWorkbench.vue'),
+        meta: { title: '经营工作台', group: '统一工作台' },
+      },
+      {
+        path: 'workbench/personal',
+        name: 'personal-workbench',
+        component: () => import('../views/workbench/PersonalWorkbench.vue'),
+        meta: { title: '我的工作台', group: '统一工作台' },
+      },
+      {
+        path: 'workbench/messages',
+        name: 'message-center',
+        component: () => import('../views/workbench/MessageCenter.vue'),
+        meta: { title: '消息中心', group: '统一工作台' },
       },
     ],
   },
@@ -47,7 +63,7 @@ router.beforeEach((to) => {
     return { name: 'login', query: { redirect: to.fullPath } }
   }
   if (to.meta.public && session && ['login', 'register', 'forgot-password'].includes(to.name)) {
-    return { name: 'home' }
+    return { name: 'operations-workbench' }
   }
   return true
 })

@@ -10,9 +10,11 @@ const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore()
 const profileVisible = ref(false)
+const notificationVisible = ref(false)
 const searchKeyword = ref('')
 
 const unreadCount = computed(() => appStore.notifications.filter((item) => !item.read).length)
+const recentNotifications = computed(() => appStore.notifications.slice(0, 4))
 
 function handleSearch() {
   const keyword = searchKeyword.value.trim()
@@ -20,12 +22,24 @@ function handleSearch() {
     ElMessage.info('请输入要查找的内容')
     return
   }
-  ElMessage.info(`“${keyword}”将在业务模块接入后提供全局检索`)
+  router.push({ path: '/workbench/messages', query: { keyword } })
+  searchKeyword.value = ''
 }
 
 function markNotificationsRead() {
   appStore.markAllRead()
   ElMessage.success('消息已全部标记为已读')
+}
+
+function openNotification(item) {
+  appStore.markRead(item.id)
+  notificationVisible.value = false
+  router.push({ path: '/workbench/messages', query: { selected: item.id } })
+}
+
+function openMessageCenter() {
+  notificationVisible.value = false
+  router.push('/workbench/messages')
 }
 
 async function logout() {
@@ -54,20 +68,25 @@ async function logout() {
         </div>
       </div>
 
-      <div v-if="!appStore.sidebarCollapsed" class="nav-label">工作空间</div>
+      <div v-if="!appStore.sidebarCollapsed" class="nav-label">业务导航</div>
       <el-menu :default-active="route.path" router :collapse="appStore.sidebarCollapsed" class="main-menu">
-        <el-menu-item index="/">
-          <el-icon><DataBoard /></el-icon>
-          <template #title>工作台</template>
-        </el-menu-item>
+        <el-sub-menu index="workbench">
+          <template #title>
+            <el-icon><DataBoard /></el-icon>
+            <span>统一工作台</span>
+          </template>
+          <el-menu-item index="/workbench/operations"><el-icon><TrendCharts /></el-icon>经营工作台</el-menu-item>
+          <el-menu-item index="/workbench/personal"><el-icon><User /></el-icon>我的工作台</el-menu-item>
+          <el-menu-item index="/workbench/messages"><el-icon><Bell /></el-icon>消息中心</el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <div v-if="!appStore.sidebarCollapsed" class="module-plan">
-        <div class="module-plan-title"><el-icon><Grid /></el-icon>业务能力</div>
+        <div class="module-plan-title"><el-icon><CircleCheck /></el-icon>工作台服务</div>
         <div class="module-plan-items">
-          <span>经营</span><span>销售</span><span>项目</span><span>财务</span>
+          <span>经营洞察</span><span>个人待办</span><span>日程协同</span><span>消息提醒</span>
         </div>
-        <p>业务模块将在后续阶段逐步接入</p>
+        <p>当前服务运行正常，数据更新至今日</p>
       </div>
 
       <button class="collapse-button" type="button" @click="appStore.toggleSidebar">
@@ -80,7 +99,7 @@ async function logout() {
       <header class="topbar">
         <div class="topbar-left">
           <el-breadcrumb separator="/">
-            <el-breadcrumb-item>智慧运营</el-breadcrumb-item>
+            <el-breadcrumb-item>{{ route.meta.group || '智慧运营' }}</el-breadcrumb-item>
             <el-breadcrumb-item>{{ route.meta.title }}</el-breadcrumb-item>
           </el-breadcrumb>
         </div>
@@ -88,14 +107,14 @@ async function logout() {
           <el-input
             v-model="searchKeyword"
             class="global-search"
-            placeholder="搜索客户、项目或任务"
+            placeholder="搜索工作台消息"
             clearable
             @keyup.enter="handleSearch"
           >
             <template #prefix><el-icon><Search /></el-icon></template>
           </el-input>
 
-          <el-popover placement="bottom-end" :width="340" trigger="click">
+          <el-popover v-model:visible="notificationVisible" placement="bottom-end" :width="360" trigger="click">
             <template #reference>
               <el-badge :value="unreadCount" :hidden="unreadCount === 0" class="action-badge">
                 <el-button circle><el-icon><Bell /></el-icon></el-button>
@@ -106,11 +125,12 @@ async function logout() {
               <el-button link type="primary" @click="markNotificationsRead">全部已读</el-button>
             </div>
             <div class="notification-list">
-              <div v-for="item in appStore.notifications" :key="item.id" class="notification-item">
+              <button v-for="item in recentNotifications" :key="item.id" type="button" class="notification-item" @click="openNotification(item)">
                 <i :class="{ read: item.read }"></i>
                 <div><p>{{ item.title }}</p><small>{{ item.time }}</small></div>
-              </div>
+              </button>
             </div>
+            <el-button class="notification-more" text bg @click="openMessageCenter">查看全部消息</el-button>
           </el-popover>
 
           <el-dropdown trigger="click">
