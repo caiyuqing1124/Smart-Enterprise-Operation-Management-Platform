@@ -1,0 +1,55 @@
+import { createRouter, createWebHistory } from 'vue-router'
+
+const routes = [
+  {
+    path: '/login',
+    name: 'login',
+    component: () => import('../views/auth/LoginView.vue'),
+    meta: { public: true, title: '登录' },
+  },
+  {
+    path: '/register',
+    name: 'register',
+    component: () => import('../views/auth/RegisterView.vue'),
+    meta: { public: true, title: '企业注册' },
+  },
+  {
+    path: '/forgot-password',
+    name: 'forgot-password',
+    component: () => import('../views/auth/ForgotPasswordView.vue'),
+    meta: { public: true, title: '找回密码' },
+  },
+  {
+    path: '/',
+    component: () => import('../layouts/AppLayout.vue'),
+    children: [
+      {
+        path: '',
+        name: 'home',
+        component: () => import('../views/home/HomeView.vue'),
+        meta: { title: '工作台' },
+      },
+    ],
+  },
+  { path: '/:pathMatch(.*)*', redirect: '/' },
+]
+
+const router = createRouter({
+  history: createWebHistory(),
+  routes,
+})
+
+router.beforeEach((to) => {
+  document.title = `${to.meta.title || '工作台'} - 智慧企业运营管理平台`
+  const session = localStorage.getItem('smart-ops-session') || sessionStorage.getItem('smart-ops-session')
+
+  if (!to.meta.public && !session) {
+    return { name: 'login', query: { redirect: to.fullPath } }
+  }
+  if (to.meta.public && session && ['login', 'register', 'forgot-password'].includes(to.name)) {
+    return { name: 'home' }
+  }
+  return true
+})
+
+export default router
