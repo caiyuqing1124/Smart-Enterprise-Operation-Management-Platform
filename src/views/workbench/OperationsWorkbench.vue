@@ -1,5 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import BaseChart from '../../components/charts/BaseChart.vue'
 import {
@@ -12,6 +13,7 @@ import {
 import { useWorkbenchStore } from '../../stores/workbench'
 
 const workbenchStore = useWorkbenchStore()
+const router = useRouter()
 const selectedPeriod = ref('2026-09')
 const selectedScope = ref('all')
 const riskLevel = ref('all')
@@ -130,6 +132,12 @@ function statusType(status) {
 function healthType(health) {
   return health === '正常' ? 'success' : 'warning'
 }
+
+function openMetric(metric) {
+  const names = { revenue: '营业收入', profit: '综合毛利率', collection: '合同回款率', projects: '项目按期交付率' }
+  if (metric.key === 'risk') router.push('/operations/cockpit')
+  else router.push({ path: '/operations/indicators', query: { keyword: names[metric.key] || '' } })
+}
 </script>
 
 <template>
@@ -153,7 +161,7 @@ function healthType(health) {
     </header>
 
     <section class="metric-strip">
-      <article v-for="metric in displayMetrics" :key="metric.key" class="metric-block">
+      <article v-for="metric in displayMetrics" :key="metric.key" class="metric-block clickable" role="button" tabindex="0" @click="openMetric(metric)" @keyup.enter="openMetric(metric)">
         <div class="metric-top">
           <span class="metric-icon"><el-icon><component :is="metric.icon" /></el-icon></span>
           <span class="metric-change" :class="metric.trend">
@@ -177,7 +185,7 @@ function healthType(health) {
       </section>
 
       <section class="wb-panel target-panel">
-        <div class="wb-panel-head"><div><h2>年度经营目标</h2><p>收入目标执行进度</p></div></div>
+        <div class="wb-panel-head"><div><h2>年度经营目标</h2><p>收入目标执行进度</p></div><el-button link type="primary" @click="router.push('/operations/goals')">查看目标</el-button></div>
         <div class="target-chart-wrap">
           <BaseChart :option="targetOption" height="205px" />
           <div class="target-center"><strong>{{ targetCompletion }}%</strong><span>目标完成率</span></div>

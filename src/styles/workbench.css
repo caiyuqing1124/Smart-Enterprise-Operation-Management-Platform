@@ -12,6 +12,7 @@
 .metric-strip { display: grid; grid-template-columns: repeat(5, 1fr); overflow: hidden; margin-bottom: 18px; border: 1px solid #e0e8f2; border-radius: 12px; background: #fff; box-shadow: 0 6px 20px rgba(27, 47, 78, .04); }
 .metric-block { min-width: 0; padding: 19px 20px 18px; border-right: 1px solid #e9eef5; }
 .metric-block:last-child { border-right: 0; }
+.metric-block.clickable { cursor: pointer; transition: background .2s, transform .2s; }.metric-block.clickable:hover { z-index: 1; background: #f8fbff; transform: translateY(-2px); }
 .metric-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 15px; }
 .metric-icon { display: grid; width: 34px; height: 34px; place-items: center; color: #246bfd; border-radius: 8px; background: #edf4ff; }
 .metric-change { display: flex; align-items: center; gap: 2px; font-size: 10px; font-weight: 600; }

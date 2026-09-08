@@ -79,6 +79,16 @@ async function logout() {
           <el-menu-item index="/workbench/personal"><el-icon><User /></el-icon>我的工作台</el-menu-item>
           <el-menu-item index="/workbench/messages"><el-icon><Bell /></el-icon>消息中心</el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="operations">
+          <template #title>
+            <el-icon><Management /></el-icon>
+            <span>经营管理</span>
+          </template>
+          <el-menu-item index="/operations/cockpit"><el-icon><Odometer /></el-icon>经营驾驶舱</el-menu-item>
+          <el-menu-item index="/operations/goals"><el-icon><Aim /></el-icon>经营目标</el-menu-item>
+          <el-menu-item index="/operations/indicators"><el-icon><DataLine /></el-icon>指标中心</el-menu-item>
+          <el-menu-item index="/operations/reports"><el-icon><Document /></el-icon>经营分析报告</el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <div v-if="!appStore.sidebarCollapsed" class="module-plan">
