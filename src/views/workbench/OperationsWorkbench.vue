@@ -217,7 +217,7 @@ function openMetric(metric) {
       </section>
 
       <section class="wb-panel funnel-panel">
-        <div class="wb-panel-head"><div><h2>重点商机漏斗</h2><p>当前有效商机金额</p></div></div>
+        <div class="wb-panel-head"><div><h2>重点商机漏斗</h2><p>当前有效商机金额</p></div><el-button link type="primary" @click="router.push('/sales/opportunities')">查看商机</el-button></div>
         <div class="funnel-list">
           <div v-for="stage in salesFunnel" :key="stage.stage" class="funnel-row">
             <div class="funnel-copy"><strong>{{ stage.stage }}</strong><span>{{ stage.count }} 项 · {{ stage.amount.toLocaleString() }} 万</span></div>

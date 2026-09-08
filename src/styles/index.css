@@ -65,3 +65,29 @@ a { color: var(--primary); text-decoration: none; }
 .notification-item:hover { background: #f7f9fc; }
 .notification-item p { color: #26344b; }
 .notification-more { width: 100%; margin-top: 10px; }
+
+/* 平台字体基线：业务正文保持清晰，辅助信息不低于 11px。 */
+:root {
+  --font-meta: 11px;
+  --font-secondary: 12px;
+  --font-body: 13px;
+  --el-font-size-base: 14px;
+  --el-font-size-small: 13px;
+  --el-font-size-extra-small: 12px;
+}
+body { font-size: 14px; line-height: 1.5; }
+.main-menu .el-menu-item,
+.main-menu .el-sub-menu__title { font-size: 14px; }
+.main-menu .el-sub-menu .el-menu-item { font-size: 13px; }
+.brand-copy small,
+.nav-label { font-size: 12px; }
+.module-plan-items span { font-size: 12px; line-height: 18px; }
+.module-plan p { font-size: 11px; line-height: 1.7; }
+.user-copy small,
+.notification-item small,
+.auth-panel footer,
+.visual-metrics span { font-size: 12px; line-height: 18px; }
+.panel-heading p,
+.readiness-info { font-size: 13px; line-height: 20px; }
+.capability-item small,
+.flow-node small { color: #7f8da1; font-size: 12px; line-height: 18px; }

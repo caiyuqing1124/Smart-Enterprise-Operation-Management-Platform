@@ -89,6 +89,13 @@ async function logout() {
           <el-menu-item index="/operations/indicators"><el-icon><DataLine /></el-icon>指标中心</el-menu-item>
           <el-menu-item index="/operations/reports"><el-icon><Document /></el-icon>经营分析报告</el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="sales">
+          <template #title><el-icon><Avatar /></el-icon><span>客户与销售</span></template>
+          <el-menu-item index="/sales/customers"><el-icon><OfficeBuilding /></el-icon>客户管理</el-menu-item>
+          <el-menu-item index="/sales/opportunities"><el-icon><Opportunity /></el-icon>商机管理</el-menu-item>
+          <el-menu-item index="/sales/contracts"><el-icon><Tickets /></el-icon>合同与回款</el-menu-item>
+          <el-menu-item index="/sales/analytics"><el-icon><DataAnalysis /></el-icon>销售分析</el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <div v-if="!appStore.sidebarCollapsed" class="module-plan">

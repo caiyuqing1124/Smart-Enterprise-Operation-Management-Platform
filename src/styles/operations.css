@@ -32,3 +32,65 @@
 
 @media print { .sidebar,.topbar,.report-toolbar { display:none !important; }.app-main { width:100%!important;margin:0!important; }.page-container { padding:0!important; }.report-document { max-width:none; border:0; box-shadow:none; }.report-section { break-inside:avoid; } }
 @media (max-width: 1350px) { .indicator-workspace { grid-template-columns: 160px minmax(520px,1fr) 290px; }.cockpit-grid.bottom-grid { grid-template-columns: 1fr 1fr; }.health-panel { grid-column:1/-1; }.cockpit-project-line { grid-template-columns:130px repeat(2,1fr); }.report-section,.report-cover { padding-left:38px;padding-right:38px; } }
+
+/* 经营管理可读性：保证驾驶舱、指标与报告中的业务信息清晰可辨。 */
+.operations-header > div:first-child > span { font-size: 11px; }
+.operations-header p { font-size: 13px; line-height: 20px; }
+.toolbar-count { font-size: 11px; }
+.management-panel .el-table { font-size: 12px; }
+.management-panel .el-table th.el-table__cell,
+.management-panel .el-table td.el-table__cell { padding: 12px 0; }
+.cockpit-header > div:first-child > span { font-size: 11px; }
+.cockpit-header p { color: #8fa6c3; font-size: 12px; line-height: 18px; }
+.cockpit-metrics span,
+.cockpit-metrics strong small,
+.cockpit-metrics em { font-size: 11px; line-height: 17px; }
+.cockpit-panel-head h2 { font-size: 14px; line-height: 20px; }
+.cockpit-panel-head span { font-size: 11px; }
+.region-ranking button { min-height: 48px; padding: 10px; }
+.region-ranking button > b,
+.region-ranking small,
+.region-ranking em { font-size: 11px; line-height: 17px; }
+.region-ranking strong { font-size: 12px; line-height: 18px; }
+.efficiency-list div { padding: 12px; }
+.efficiency-list span,
+.efficiency-list strong small,
+.efficiency-list em,
+.cockpit-alert { font-size: 11px; line-height: 17px; }
+.cockpit-project-line { padding-block: 15px; }
+.cockpit-project-line span { font-size: 11px; line-height: 17px; }
+.cockpit-project-line strong { font-size: 12px; line-height: 18px; }
+.goal-summary-bar span,
+.goal-progress > span { font-size: 11px; line-height: 17px; }
+.goal-detail .detail-badge { font-size: 12px; }
+.indicator-categories h3 { font-size: 12px; }
+.indicator-categories button { height: 44px; }
+.indicator-categories button span { font-size: 13px; }
+.indicator-categories button b { font-size: 11px; }
+.indicator-health span,
+.indicator-health small { font-size: 11px; line-height: 17px; }
+.indicator-list-area .el-table { font-size: 12px; }
+.indicator-list-area .el-table th.el-table__cell,
+.indicator-list-area .el-table td.el-table__cell { padding: 12px 0; }
+.indicator-detail-head span,
+.indicator-values span { font-size: 11px; line-height: 17px; }
+.indicator-definition { font-size: 12px; line-height: 1.75; }
+.indicator-values small { font-size: 11px; }
+.indicator-detail > h3 { font-size: 13px; }
+.report-brand { font-size: 11px; }
+.report-cover p { font-size: 12px; line-height: 18px; }
+.report-cover > div:last-child { font-size: 11px; }
+.report-section-title > span { font-size: 12px; }
+.report-section-title p,
+.report-metric-row span,
+.report-metric-row small,
+.report-metric-row em { font-size: 11px; line-height: 17px; }
+.report-highlights b,
+.report-highlights span { font-size: 12px; line-height: 18px; }
+.report-issues article > div > span { font-size: 11px; }
+.report-issues h3 { font-size: 14px; line-height: 20px; }
+.report-issues p { font-size: 12px; line-height: 1.75; }
+.action-plan-section .el-table { font-size: 12px; }
+.action-plan-section .el-table th.el-table__cell,
+.action-plan-section .el-table td.el-table__cell { padding: 12px 0; }
+.report-footer { font-size: 11px; line-height: 17px; }

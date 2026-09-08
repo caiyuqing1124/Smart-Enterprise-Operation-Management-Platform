@@ -79,3 +79,60 @@
   .approval-cards { grid-template-columns: repeat(2, 1fr); }
   .message-workspace { grid-template-columns: 170px minmax(430px, 1fr) 300px; }
 }
+
+/* 工作台可读性：统一标题、正文与辅助信息的三级层级。 */
+.section-kicker { font-size: 11px; }
+.wb-panel-head p,
+.metric-label,
+.target-status { font-size: 12px; line-height: 18px; }
+.metric-change,
+.metric-note,
+.update-time,
+.target-center span,
+.target-numbers span { font-size: 11px; line-height: 17px; }
+.target-numbers strong { font-size: 14px; }
+.department-panel .el-table,
+.projects-panel .el-table { font-size: 12px; }
+.department-panel .el-table th.el-table__cell,
+.projects-panel .el-table th.el-table__cell { padding: 12px 0; font-size: 12px; }
+.department-panel .el-table td.el-table__cell,
+.projects-panel .el-table td.el-table__cell { padding: 12px 0; }
+.funnel-copy strong { font-size: 13px; line-height: 19px; }
+.funnel-copy span { font-size: 11px; line-height: 17px; }
+.funnel-row b { font-size: 12px; }
+.risk-item { min-height: 54px; padding: 12px; }
+.risk-level { font-size: 11px; }
+.risk-copy strong { font-size: 13px; line-height: 19px; }
+.risk-copy small,
+.risk-deadline { font-size: 11px; line-height: 17px; }
+.personal-greeting > span { font-size: 12px; }
+.personal-greeting p { font-size: 13px; line-height: 20px; }
+.personal-brief span { font-size: 11px; }
+.task-row { min-height: 74px; }
+.task-main strong { font-size: 13px; line-height: 19px; }
+.task-main span,
+.task-deadline { font-size: 11px; line-height: 17px; }
+.day-plan-head span { font-size: 11px; }
+.schedule-item { padding-block: 16px; }
+.schedule-time { font-size: 12px; }
+.schedule-copy strong { font-size: 13px; line-height: 19px; }
+.schedule-copy small { font-size: 11px; line-height: 17px; }
+.approval-intro p { font-size: 11px; line-height: 17px; }
+.approval-card-top > span { font-size: 11px; }
+.approval-card h3 { font-size: 14px; line-height: 20px; }
+.approval-card p { font-size: 12px; line-height: 18px; }
+.category-title { font-size: 12px; }
+.category-item { height: 44px; }
+.category-item span { font-size: 13px; }
+.category-item b { font-size: 11px; }
+.unread-summary > span,
+.message-batchbar { font-size: 12px; }
+.unread-summary small { font-size: 11px; line-height: 17px; }
+.message-filters { gap: 10px; padding: 18px; }
+.message-row { min-height: 96px; padding: 17px 16px; }
+.message-row-copy strong { font-size: 13px; line-height: 19px; }
+.message-row-copy p { font-size: 12px; line-height: 1.6; }
+.message-row-copy > span,
+.detail-meta { font-size: 11px; line-height: 17px; }
+.detail-status { font-size: 12px; }
+.message-detail-empty p { font-size: 12px; line-height: 1.7; }
