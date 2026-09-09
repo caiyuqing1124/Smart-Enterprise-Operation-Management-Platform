@@ -1,6 +1,7 @@
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { initialGoals, initialIndicators, initialReports } from '../mock/operations'
+import { createBusinessPersistence } from './persistence'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 
@@ -34,6 +35,17 @@ export const useOperationsStore = defineStore('operations', () => {
   const indicators = ref(clone(initialIndicators))
   const reports = ref(clone(initialReports))
   const goalOptions = computed(() => goals.value.map((item) => ({ label: item.name, value: item.id })))
+  const persistence = createBusinessPersistence(
+    'operations',
+    () => ({ goals: goals.value, indicators: indicators.value, reports: reports.value }),
+    (state) => {
+      if (Array.isArray(state.goals)) goals.value = state.goals
+      if (Array.isArray(state.indicators)) indicators.value = state.indicators
+      if (state.reports && typeof state.reports === 'object') reports.value = state.reports
+    },
+  )
+
+  watch([goals, indicators, reports], persistence.persist, { deep: true })
 
   function addGoal(payload) {
     const goal = { id: Date.now(), updatedAt: new Date().toISOString().slice(0, 10), ...payload }
@@ -72,7 +84,7 @@ export const useOperationsStore = defineStore('operations', () => {
   function removeAction(period, id) { reports.value[period].actions = reports.value[period].actions.filter((item) => item.id !== id) }
 
   return {
-    goals, indicators, reports, goalOptions,
+    goals, indicators, reports, goalOptions, hydrate: persistence.hydrate,
     addGoal, updateGoal, removeGoal,
     addIndicator, updateIndicator, removeIndicator, toggleIndicator, toggleSubscription,
     updateConclusion, addAction, updateAction, removeAction,

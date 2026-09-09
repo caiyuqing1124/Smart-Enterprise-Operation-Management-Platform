@@ -3,9 +3,10 @@ import { computed, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { customerIndustries, customerLevels, salesOwners } from '../../mock/sales'
+import { useProjectStore } from '../../stores/projects'
 import { useSalesStore } from '../../stores/sales'
 
-const router = useRouter(), store = useSalesStore()
+const router = useRouter(), store = useSalesStore(), projectStore = useProjectStore()
 const keyword = ref(''), level = ref('all'), industry = ref('all'), status = ref('all'), region = ref('all')
 const selectedRows = ref([]), formVisible = ref(false), assignVisible = ref(false), mode = ref('create'), formRef = ref(), assignedOwner = ref('')
 const form = reactive({ id: null, name: '', shortName: '', industry: '', region: '华东', level: '普通客户', owner: '', status: '意向', address: '', scale: '200—499 人', source: '', tags: [] })
@@ -17,7 +18,7 @@ function resetForm() { Object.assign(form, { id: null, name: '', shortName: '', 
 function openCreate() { resetForm(); mode.value = 'create'; formVisible.value = true }
 function openEdit(row) { Object.assign(form, JSON.parse(JSON.stringify(row))); mode.value = 'edit'; formVisible.value = true }
 async function save() { await formRef.value.validate(); const payload = { ...form }; delete payload.id; mode.value === 'create' ? store.addCustomer(payload) : store.updateCustomer(form.id, payload); formVisible.value = false; ElMessage.success(mode.value === 'create' ? '客户已新增' : '客户资料已更新') }
-async function remove(row) { try { await ElMessageBox.confirm(`删除“${row.name}”将同时移除其联系人、商机和合同数据，确定继续吗？`, '删除客户', { confirmButtonText: '确定删除', cancelButtonText: '取消', type: 'warning' }); store.removeCustomer(row.id); ElMessage.success('客户已删除') } catch { /* 保留客户。 */ } }
+async function remove(row) { if (projectStore.projects.some((item) => item.customerId === row.id && !item.archived)) { ElMessage.warning('该客户存在未归档项目，请先完成或归档关联项目'); return } try { await ElMessageBox.confirm(`删除“${row.name}”将同时移除其联系人、商机和合同数据，确定继续吗？`, '删除客户', { confirmButtonText: '确定删除', cancelButtonText: '取消', type: 'warning' }); store.removeCustomer(row.id); ElMessage.success('客户已删除') } catch { /* 保留客户。 */ } }
 function openAssign() { if (!selectedRows.value.length) return; assignedOwner.value = ''; assignVisible.value = true }
 function saveAssign() { if (!assignedOwner.value) { ElMessage.warning('请选择负责人'); return }; selectedRows.value.forEach((item) => store.updateCustomer(item.id, { owner: assignedOwner.value })); assignVisible.value = false; selectedRows.value = []; ElMessage.success('客户负责人已批量更新') }
 function exportCustomers() { const rows = [['客户编号','客户名称','行业','区域','等级','负责人','合同金额','已回款','状态'], ...filtered.value.map((i) => [i.code,i.name,i.industry,i.region,i.level,i.owner,i.contractAmount,i.paidAmount,i.status])]; const link=document.createElement('a'); link.href=URL.createObjectURL(new Blob([`\ufeff${rows.map((r)=>r.join(',')).join('\n')}`],{type:'text/csv;charset=utf-8'})); link.download='客户台账.csv'; link.click(); URL.revokeObjectURL(link.href); ElMessage.success('客户台账已导出') }

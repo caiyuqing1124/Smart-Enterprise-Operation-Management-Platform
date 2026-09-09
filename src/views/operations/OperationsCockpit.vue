@@ -2,8 +2,11 @@
 import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import BaseChart from '../../components/charts/BaseChart.vue'
-import { efficiencyMetrics, industryContribution, operationRisks, operationSnapshots, projectHealth, regionPerformance } from '../../mock/operations'
+import { efficiencyMetrics, industryContribution, operationRisks, operationSnapshots, regionPerformance } from '../../mock/operations'
+import { useProjectStore } from '../../stores/projects'
 
+const projectStore = useProjectStore()
+const projectHealth = computed(() => projectStore.activeProjects.slice(0, 4))
 const period = ref('2026-09')
 const dimension = ref('all')
 const detailVisible = ref(false)

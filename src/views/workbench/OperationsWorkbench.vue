@@ -7,18 +7,20 @@ import {
   departmentPerformance,
   operationRisks,
   operationSnapshots,
-  projectHealth,
   salesFunnel,
 } from '../../mock/workbench'
+import { useProjectStore } from '../../stores/projects'
 import { useWorkbenchStore } from '../../stores/workbench'
 
 const workbenchStore = useWorkbenchStore()
+const projectStore = useProjectStore()
 const router = useRouter()
 const selectedPeriod = ref('2026-09')
 const selectedScope = ref('all')
 const riskLevel = ref('all')
 const riskDrawerVisible = ref(false)
 const selectedRisk = ref(null)
+const projectHealth = computed(() => projectStore.activeProjects.slice(0, 4).map((item) => ({ ...item, manager: projectStore.employeeMap[item.managerId]?.name, budgetRate: item.budgetCost ? Math.round(item.actualCost / item.budgetCost * 100) : 0, deadline: item.plannedEnd })))
 
 const scopeData = {
   all: { label: '企业全局', factor: 1, metrics: null },
@@ -231,7 +233,7 @@ function openMetric(metric) {
     <div class="operations-bottom-grid">
       <section class="wb-panel projects-panel">
         <div class="wb-panel-head"><div><h2>重点项目健康度</h2><p>进度、预算与交付节点综合评估</p></div><el-tag effect="plain">{{ projectHealth.length }} 个重点项目</el-tag></div>
-        <el-table :data="projectHealth">
+        <el-table :data="projectHealth" @row-click="(row) => router.push(`/projects/${row.id}`)">
           <el-table-column prop="name" label="项目名称" min-width="210" />
           <el-table-column prop="manager" label="项目经理" width="92" />
           <el-table-column label="项目进度" min-width="150">

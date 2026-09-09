@@ -72,6 +72,20 @@ function viewSchedule(item) {
   })
 }
 
+async function removeSchedule(item) {
+  try {
+    await ElMessageBox.confirm(`确定删除日程“${item.title}”吗？`, '删除日程', {
+      confirmButtonText: '确定删除',
+      cancelButtonText: '取消',
+      type: 'warning',
+    })
+    workbenchStore.removeSchedule(item.id)
+    ElMessage.success('日程已删除')
+  } catch {
+    // 用户取消时保留原日程。
+  }
+}
+
 function openApproval(approval) {
   selectedApproval.value = approval
   approvalDialogVisible.value = true
@@ -143,12 +157,14 @@ function formatMoney(value) {
           <el-button circle size="small" @click="openScheduleDialog"><el-icon><Plus /></el-icon></el-button>
         </div>
         <div class="schedule-timeline">
-          <button v-for="(item, index) in workbenchStore.schedules" :key="item.id" type="button" class="schedule-item" @click="viewSchedule(item)">
+          <div v-for="(item, index) in workbenchStore.schedules" :key="item.id" class="schedule-item" role="button" tabindex="0" @click="viewSchedule(item)" @keydown.enter="viewSchedule(item)" @keydown.space.prevent="viewSchedule(item)">
             <span class="schedule-time">{{ item.time }}</span>
             <i :class="`tone-${index % 4}`"></i>
             <span class="schedule-copy"><strong>{{ item.title }}</strong><small>{{ item.location }} · {{ item.type }}</small></span>
             <el-icon><ArrowRight /></el-icon>
-          </button>
+            <el-button class="schedule-delete" link type="danger" aria-label="删除日程" @click.stop="removeSchedule(item)" @keydown.enter.stop @keydown.space.stop>删除</el-button>
+          </div>
+          <el-empty v-if="workbenchStore.schedules.length === 0" description="今日暂无安排" :image-size="64" />
         </div>
       </section>
     </div>

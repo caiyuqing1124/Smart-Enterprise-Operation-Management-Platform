@@ -4,6 +4,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAppStore } from '../stores/app'
 import { useAuthStore } from '../stores/auth'
+import { resetBusinessData } from '../stores/persistence'
 
 const route = useRoute()
 const router = useRouter()
@@ -55,6 +56,25 @@ async function logout() {
     // 用户取消退出时保持当前页面。
   }
 }
+
+async function restoreInitialData() {
+  try {
+    await ElMessageBox.confirm(
+      '此操作将清除当前浏览器中保存的业务修改，并恢复系统内置初始数据。账号和登录信息不会被删除，确定继续吗？',
+      '恢复初始业务数据',
+      {
+        confirmButtonText: '确认恢复',
+        cancelButtonText: '取消',
+        type: 'warning',
+      },
+    )
+    await resetBusinessData()
+    ElMessage.success('业务数据已恢复，即将重新加载页面')
+    window.setTimeout(() => window.location.reload(), 500)
+  } catch {
+    // 用户取消恢复时保留当前业务数据。
+  }
+}
 </script>
 
 <template>
@@ -95,6 +115,13 @@ async function logout() {
           <el-menu-item index="/sales/opportunities"><el-icon><Opportunity /></el-icon>商机管理</el-menu-item>
           <el-menu-item index="/sales/contracts"><el-icon><Tickets /></el-icon>合同与回款</el-menu-item>
           <el-menu-item index="/sales/analytics"><el-icon><DataAnalysis /></el-icon>销售分析</el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="projects">
+          <template #title><el-icon><Briefcase /></el-icon><span>项目交付</span></template>
+          <el-menu-item index="/projects"><el-icon><DataBoard /></el-icon>项目总览</el-menu-item>
+          <el-menu-item index="/projects/tasks"><el-icon><List /></el-icon>任务计划</el-menu-item>
+          <el-menu-item index="/projects/milestones"><el-icon><Stamp /></el-icon>里程碑管理</el-menu-item>
+          <el-menu-item index="/projects/resources"><el-icon><Histogram /></el-icon>项目资源</el-menu-item>
         </el-sub-menu>
       </el-menu>
 
@@ -182,6 +209,11 @@ async function logout() {
           <el-descriptions-item label="登录账号">{{ authStore.currentUser?.account }}</el-descriptions-item>
           <el-descriptions-item label="账号状态"><el-tag type="success">正常</el-tag></el-descriptions-item>
         </el-descriptions>
+        <div class="profile-data-actions">
+          <strong>本地数据管理</strong>
+          <p>清除当前浏览器中的业务修改，重新载入系统内置数据。</p>
+          <el-button type="danger" plain @click="restoreInitialData">恢复初始业务数据</el-button>
+        </div>
       </div>
     </el-drawer>
   </div>

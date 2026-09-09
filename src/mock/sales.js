@@ -51,13 +51,15 @@ export const initialContracts = [
 export const initialPaymentPlans = [
   { id: 1, contractId: 1, phase: '首付款', dueDate: '2026-03-10', amount: 176, paidAmount: 176, paidDate: '2026-03-08', status: '已回款' },
   { id: 2, contractId: 1, phase: '阶段款', dueDate: '2026-07-30', amount: 222, paidAmount: 222, paidDate: '2026-07-28', status: '已回款' },
-  { id: 3, contractId: 1, phase: '验收款', dueDate: '2026-11-25', amount: 188, paidAmount: 0, paidDate: '', status: '未到期' },
+  { id: 3, contractId: 1, projectId: 1, isAcceptancePayment: true, phase: '验收款', dueDate: '2026-11-25', amount: 188, paidAmount: 0, paidDate: '', status: '未到期' },
   { id: 4, contractId: 2, phase: '首付款', dueDate: '2026-05-15', amount: 140, paidAmount: 140, paidDate: '2026-05-14', status: '已回款' },
   { id: 5, contractId: 2, phase: '阶段款', dueDate: '2026-08-26', amount: 146, paidAmount: 86, paidDate: '2026-08-25', status: '逾期' },
-  { id: 6, contractId: 2, phase: '验收款', dueDate: '2026-12-20', amount: 182, paidAmount: 60, paidDate: '2026-09-02', status: '未到期' },
-  { id: 7, contractId: 3, phase: '项目款', dueDate: '2026-09-30', amount: 356, paidAmount: 252, paidDate: '2026-08-30', status: '部分回款' },
-  { id: 8, contractId: 4, phase: '项目款', dueDate: '2026-09-25', amount: 298, paidAmount: 238, paidDate: '2026-08-28', status: '部分回款' },
+  { id: 6, contractId: 2, projectId: 2, isAcceptancePayment: true, phase: '验收款', dueDate: '2026-12-20', amount: 182, paidAmount: 60, paidDate: '2026-09-02', status: '未到期' },
+  { id: 7, contractId: 3, projectId: 3, isAcceptancePayment: true, phase: '项目验收款', dueDate: '2026-09-30', amount: 356, paidAmount: 252, paidDate: '2026-08-30', status: '部分回款' },
+  { id: 8, contractId: 4, projectId: 4, isAcceptancePayment: true, phase: '项目验收款', dueDate: '2026-09-25', amount: 298, paidAmount: 238, paidDate: '2026-08-28', status: '部分回款' },
   { id: 9, contractId: 5, phase: '首付款', dueDate: '2026-09-08', amount: 86, paidAmount: 42, paidDate: '2026-09-05', status: '部分回款' },
+  { id: 10, contractId: 5, projectId: 5, isAcceptancePayment: true, phase: '协同项目验收款', dueDate: '2027-01-15', amount: 75, paidAmount: 0, paidDate: '', status: '未到期' },
+  { id: 11, contractId: 5, projectId: 6, isAcceptancePayment: true, phase: '治理项目验收款', dueDate: '2027-02-20', amount: 54, paidAmount: 0, paidDate: '', status: '未到期' },
 ]
 
 export const salesTrend = { months: ['4 月', '5 月', '6 月', '7 月', '8 月', '9 月'], signed: [680, 760, 925, 846, 1085, 1248], paid: [526, 598, 716, 682, 864, 1012], customers: [4, 5, 7, 6, 8, 9] }
