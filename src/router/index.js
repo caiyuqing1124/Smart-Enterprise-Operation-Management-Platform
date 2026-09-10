@@ -79,6 +79,8 @@ const routes = [
       { path: 'projects/milestones', name: 'project-milestones', component: () => import('../views/projects/MilestoneManagement.vue'), meta: { title: '里程碑管理', group: '项目交付' } },
       { path: 'projects/resources', name: 'project-resources', component: () => import('../views/projects/ProjectResources.vue'), meta: { title: '项目资源', group: '项目交付' } },
       { path: 'projects/:id', name: 'project-detail', component: () => import('../views/projects/ProjectDetail.vue'), meta: { title: '项目详情', group: '项目交付' } },
+      { path: 'finance/overview', name: 'finance-overview', component: () => import('../views/finance/FinanceOverview.vue'), meta: { title: '财务概览', group: '财务运营' } },
+      { path: 'finance/ledger', name: 'finance-ledger', component: () => import('../views/finance/FinanceLedger.vue'), meta: { title: '财务台账', group: '财务运营' } },
     ],
   },
   { path: '/:pathMatch(.*)*', redirect: '/' },
@@ -111,6 +113,9 @@ async function hydrateRouteStores(path) {
   } else if (path.startsWith('/projects')) {
     const [projectModule, salesModule] = await Promise.all([import('../stores/projects'), import('../stores/sales')])
     pending.push(projectModule.useProjectStore().hydrate(), salesModule.useSalesStore().hydrate())
+  } else if (path.startsWith('/finance/')) {
+    const [financeModule, projectModule, salesModule] = await Promise.all([import('../stores/finance'), import('../stores/projects'), import('../stores/sales')])
+    pending.push(financeModule.useFinanceStore().hydrate(), projectModule.useProjectStore().hydrate(), salesModule.useSalesStore().hydrate())
   }
 
   await Promise.all(pending)

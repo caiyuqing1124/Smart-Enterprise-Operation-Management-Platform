@@ -127,8 +127,8 @@ function formatMoney(value) {
     </section>
 
     <div class="personal-work-grid">
-      <section class="wb-panel task-board">
-        <div class="wb-panel-head task-board-head">
+      <section class="wb-panel personal-task-board">
+        <div class="wb-panel-head personal-task-board-head">
           <div><h2>我的任务</h2><p>按优先级和截止时间推进个人事项</p></div>
           <el-radio-group v-model="taskFilter" size="small">
             <el-radio-button value="pending">待处理 {{ pendingTaskCount }}</el-radio-button>

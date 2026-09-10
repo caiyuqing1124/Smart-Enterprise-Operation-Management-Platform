@@ -34,6 +34,7 @@ import {
   Management,
   Message,
   Money,
+  MoreFilled,
   Odometer,
   OfficeBuilding,
   Opportunity,
@@ -66,6 +67,7 @@ import './styles/workbench.css'
 import './styles/operations.css'
 import './styles/sales.css'
 import './styles/projects.css'
+import './styles/finance.css'
 
 const app = createApp(App)
 
@@ -104,6 +106,7 @@ const icons = {
   Management,
   Message,
   Money,
+  MoreFilled,
   Odometer,
   OfficeBuilding,
   Opportunity,

@@ -123,6 +123,11 @@ async function restoreInitialData() {
           <el-menu-item index="/projects/milestones"><el-icon><Stamp /></el-icon>里程碑管理</el-menu-item>
           <el-menu-item index="/projects/resources"><el-icon><Histogram /></el-icon>项目资源</el-menu-item>
         </el-sub-menu>
+        <el-sub-menu index="finance">
+          <template #title><el-icon><Wallet /></el-icon><span>财务运营</span></template>
+          <el-menu-item index="/finance/overview"><el-icon><DataAnalysis /></el-icon>财务概览</el-menu-item>
+          <el-menu-item index="/finance/ledger"><el-icon><CreditCard /></el-icon>财务台账</el-menu-item>
+        </el-sub-menu>
       </el-menu>
 
       <div v-if="!appStore.sidebarCollapsed" class="module-plan">
