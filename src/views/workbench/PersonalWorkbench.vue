@@ -53,6 +53,19 @@ function toggleTask(task) {
   ElMessage.success(wasCompleted ? '任务已重新打开' : '任务已完成')
 }
 
+function openTask(task) {
+  const sourceTargets = {
+    经营管理: '/operations/reports',
+    项目交付: '/projects/tasks',
+    客户销售: '/sales/contracts',
+    财务运营: '/finance/ledger',
+    组织协同: '/workbench/messages',
+  }
+  const target = task.target || sourceTargets[task.source]
+  if (target) router.push(target)
+  else ElMessage.info('该个人任务没有关联业务页面')
+}
+
 function openScheduleDialog() {
   Object.assign(scheduleForm, { title: '', time: '', location: '', type: '会议' })
   scheduleDialogVisible.value = true
@@ -136,8 +149,8 @@ function formatMoney(value) {
           </el-radio-group>
         </div>
         <div class="task-list">
-          <div v-for="task in filteredTasks" :key="task.id" class="task-row" :class="{ completed: task.status === 'completed' }">
-            <button class="task-check" type="button" :aria-label="task.status === 'completed' ? '重新打开任务' : '完成任务'" @click="toggleTask(task)">
+          <div v-for="task in filteredTasks" :key="task.id" class="task-row" :class="{ completed: task.status === 'completed' }" role="button" tabindex="0" @click="openTask(task)" @keydown.enter="openTask(task)" @keydown.space.prevent="openTask(task)">
+            <button class="task-check" type="button" :aria-label="task.status === 'completed' ? '重新打开任务' : '完成任务'" @click.stop="toggleTask(task)" @keydown.enter.stop @keydown.space.stop>
               <el-icon><CircleCheckFilled v-if="task.status === 'completed'" /><CircleCheck v-else /></el-icon>
             </button>
             <div class="task-main">

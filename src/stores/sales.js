@@ -1,6 +1,7 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
 import { initialContacts, initialContracts, initialCustomers, initialFollowUps, initialOpportunities, initialPaymentPlans } from '../mock/sales'
+import { useAppStore } from './app'
 import { createBusinessPersistence } from './persistence'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
@@ -44,7 +45,29 @@ export const useSalesStore = defineStore('sales', () => {
   function updateContract(id, payload) { const item = contracts.value.find((row) => row.id === id); if (!item) return; const oldCustomer = customers.value.find((row) => row.id === item.customerId); const newCustomer = customers.value.find((row) => row.id === payload.customerId); if (oldCustomer) { oldCustomer.contractAmount -= item.amount; oldCustomer.paidAmount -= item.paid } Object.assign(item, payload); if (newCustomer) { newCustomer.contractAmount += item.amount; newCustomer.paidAmount += item.paid } }
   function removeContract(id) { const contract = contracts.value.find((item) => item.id === id); if (contract) { const customer = customers.value.find((item) => item.id === contract.customerId); if (customer) { customer.contractAmount -= contract.amount; customer.paidAmount -= contract.paid } } contracts.value = contracts.value.filter((item) => item.id !== id); paymentPlans.value = paymentPlans.value.filter((item) => item.contractId !== id) }
   function addPaymentPlan(payload) { paymentPlans.value.push({ id: Date.now(), paidAmount: 0, paidDate: '', status: '未到期', ...payload }) }
-  function registerPayment(planId, amount, paidDate) { const plan = paymentPlans.value.find((item) => item.id === planId); if (!plan) return; const increment = Math.min(Number(amount), plan.amount - plan.paidAmount); plan.paidAmount += increment; plan.paidDate = paidDate; plan.status = plan.paidAmount >= plan.amount ? '已回款' : '部分回款'; const contract = contracts.value.find((item) => item.id === plan.contractId); if (contract) { contract.paid += increment; if (contract.status === '待结算' && contract.paid >= contract.amount) contract.status = '已完成'; const customer = customers.value.find((item) => item.id === contract.customerId); if (customer) customer.paidAmount += increment } }
+  function registerPayment(planId, amount, paidDate) {
+    const plan = paymentPlans.value.find((item) => item.id === planId)
+    if (!plan) return
+    const increment = Math.min(Number(amount), plan.amount - plan.paidAmount)
+    plan.paidAmount += increment
+    plan.paidDate = paidDate
+    plan.status = plan.paidAmount >= plan.amount ? '已回款' : '部分回款'
+    const contract = contracts.value.find((item) => item.id === plan.contractId)
+    if (!contract) return
+    contract.paid += increment
+    if (contract.status === '待结算' && contract.paid >= contract.amount) contract.status = '已完成'
+    const customer = customers.value.find((item) => item.id === contract.customerId)
+    if (customer) customer.paidAmount += increment
+    useAppStore().addNotification({
+      type: 'operation',
+      typeName: '经营动态',
+      title: `${customer?.shortName || customer?.name || '客户'}到账 ${increment} 万元`,
+      content: `${contract.code} ${plan.phase}已登记回款，合同、客户、财务台账和经营看板已同步更新。`,
+      source: '合同回款',
+      priority: '普通',
+      target: { path: '/sales/contracts', query: { selected: contract.id } },
+    })
+  }
   function markAcceptanceDue(contractId, acceptanceDate, projectId) { const contract = contracts.value.find((item) => item.id === contractId); if (!contract) return; contract.status = '待结算'; paymentPlans.value.filter((item) => item.contractId === contractId && item.projectId === projectId && item.isAcceptancePayment && item.status !== '已回款').forEach((item) => { item.dueDate = acceptanceDate; item.status = '待回款' }) }
   return { customers, contacts, followUps, opportunities, contracts, paymentPlans, customerMap, hydrate: persistence.hydrate, addCustomer, updateCustomer, removeCustomer, addContact, updateContact, removeContact, addFollowUp, addOpportunity, updateOpportunity, removeOpportunity, changeOpportunityStage, addContract, updateContract, removeContract, addPaymentPlan, registerPayment, markAcceptanceDue }
 })

@@ -5,15 +5,15 @@ import { ElMessage } from 'element-plus'
 import BaseChart from '../../components/charts/BaseChart.vue'
 import {
   departmentPerformance,
-  operationRisks,
   operationSnapshots,
-  salesFunnel,
 } from '../../mock/workbench'
+import { useBusinessMetrics } from '../../stores/businessMetrics'
 import { useProjectStore } from '../../stores/projects'
 import { useWorkbenchStore } from '../../stores/workbench'
 
 const workbenchStore = useWorkbenchStore()
 const projectStore = useProjectStore()
+const businessMetrics = useBusinessMetrics()
 const router = useRouter()
 const selectedPeriod = ref('2026-09')
 const selectedScope = ref('all')
@@ -31,6 +31,7 @@ const scopeData = {
 
 const snapshot = computed(() => operationSnapshots[selectedPeriod.value])
 const displayMetrics = computed(() => {
+  if (selectedPeriod.value === '2026-09' && selectedScope.value === 'all') return businessMetrics.currentMetrics.value
   const override = scopeData[selectedScope.value].metrics
   if (!override) return snapshot.value.metrics
   return snapshot.value.metrics.map((item, index) => ({ ...item, value: override[index] }))
@@ -45,9 +46,10 @@ const filteredDepartments = computed(() => {
   return departmentPerformance.filter((item) => item.name === mapping[selectedScope.value])
 })
 const filteredRisks = computed(() => {
-  if (riskLevel.value === 'all') return operationRisks
-  return operationRisks.filter((item) => item.level === riskLevel.value)
+  if (riskLevel.value === 'all') return businessMetrics.operationRisks.value
+  return businessMetrics.operationRisks.value.filter((item) => item.level === riskLevel.value)
 })
+const liveSalesFunnel = computed(() => businessMetrics.salesFunnel.value)
 
 const trendOption = computed(() => {
   const factor = scopeData[selectedScope.value].factor
@@ -127,6 +129,12 @@ function openRisk(risk) {
   riskDrawerVisible.value = true
 }
 
+function openRiskTarget() {
+  if (!selectedRisk.value?.target) return
+  riskDrawerVisible.value = false
+  router.push(selectedRisk.value.target)
+}
+
 function statusType(status) {
   return { 领先: 'success', 正常: 'primary', 关注: 'warning' }[status] || 'info'
 }
@@ -136,6 +144,17 @@ function healthType(health) {
 }
 
 function openMetric(metric) {
+  if (metric.live) {
+    const liveTargets = {
+      revenue: '/finance/overview',
+      profit: '/finance/overview',
+      collection: '/finance/ledger',
+      projects: '/projects',
+      risk: '/operations/cockpit',
+    }
+    router.push(liveTargets[metric.key])
+    return
+  }
   const names = { revenue: '营业收入', profit: '综合毛利率', collection: '合同回款率', projects: '项目按期交付率' }
   if (metric.key === 'risk') router.push('/operations/cockpit')
   else router.push({ path: '/operations/indicators', query: { keyword: names[metric.key] || '' } })
@@ -166,14 +185,15 @@ function openMetric(metric) {
       <article v-for="metric in displayMetrics" :key="metric.key" class="metric-block clickable" role="button" tabindex="0" @click="openMetric(metric)" @keyup.enter="openMetric(metric)">
         <div class="metric-top">
           <span class="metric-icon"><el-icon><component :is="metric.icon" /></el-icon></span>
-          <span class="metric-change" :class="metric.trend">
+          <span v-if="!metric.live" class="metric-change" :class="metric.trend">
             <el-icon><Top v-if="metric.trend === 'up'" /><Bottom v-else /></el-icon>
             {{ metric.change }}{{ metric.unit === '%' ? ' 个百分点' : '' }}
           </span>
+          <span v-else class="metric-change up">实时</span>
         </div>
         <span class="metric-label">{{ metric.label }}</span>
         <strong>{{ formatMetric(metric) }}<small>{{ metric.unit }}</small></strong>
-        <span class="metric-note">较上期{{ metric.trend === 'up' ? '提升' : '下降' }}</span>
+        <span class="metric-note">{{ metric.live ? '已联动业务数据' : `较上期${metric.trend === 'up' ? '提升' : '下降'}` }}</span>
       </article>
     </section>
 
@@ -221,7 +241,7 @@ function openMetric(metric) {
       <section class="wb-panel funnel-panel">
         <div class="wb-panel-head"><div><h2>重点商机漏斗</h2><p>当前有效商机金额</p></div><el-button link type="primary" @click="router.push('/sales/opportunities')">查看商机</el-button></div>
         <div class="funnel-list">
-          <div v-for="stage in salesFunnel" :key="stage.stage" class="funnel-row">
+          <div v-for="stage in liveSalesFunnel" :key="stage.stage" class="funnel-row">
             <div class="funnel-copy"><strong>{{ stage.stage }}</strong><span>{{ stage.count }} 项 · {{ stage.amount.toLocaleString() }} 万</span></div>
             <div class="funnel-track"><span :style="{ width: `${stage.rate}%` }"></span></div>
             <b>{{ stage.rate }}%</b>
@@ -269,6 +289,7 @@ function openMetric(metric) {
           <el-descriptions-item label="处置期限">2026-{{ selectedRisk.deadline }}</el-descriptions-item>
         </el-descriptions>
         <div class="risk-description"><h4>风险说明</h4><p>{{ selectedRisk.detail }}</p></div>
+        <el-button v-if="selectedRisk.target" type="primary" @click="openRiskTarget">打开关联业务</el-button>
       </div>
     </el-drawer>
   </div>

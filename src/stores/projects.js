@@ -180,12 +180,25 @@ export const useProjectStore = defineStore('projects', () => {
     const project = projectMap.value[item.projectId]
     if (item.isCustomerAcceptance && project) project.acceptanceStatus = '整改中'
     addActivity(item.projectId, `验收退回：${item.name}；${reason}`, item.ownerId)
+    if (project) {
+      useAppStore().addNotification({
+        type: 'risk', typeName: '风险预警', title: `${project.name}验收被退回`,
+        content: `${item.name}进入整改，退回原因：${reason}`, source: '项目交付',
+        priority: '高', target: `/projects/${project.id}`,
+      })
+    }
   }
 
   function addRisk(payload) {
     const item = { id: Date.now(), status: '监控中', ...payload }
     risks.value.unshift(item)
     addActivity(item.projectId, `新增项目风险：${item.title}`, item.ownerId)
+    const project = projectMap.value[item.projectId]
+    useAppStore().addNotification({
+      type: 'risk', typeName: '风险预警', title: item.title,
+      content: `${project?.name || '项目'}新增${item.level || '中'}风险，请按计划推进处置。`, source: '项目交付',
+      priority: item.level === '高' ? '高' : '中', target: `/projects/${item.projectId}`,
+    })
   }
 
   function updateRisk(id, payload) {

@@ -2,9 +2,11 @@
 import { computed, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { operationSnapshots, reportPeriods } from '../../mock/operations'
+import { useBusinessMetrics } from '../../stores/businessMetrics'
 import { useOperationsStore } from '../../stores/operations'
 
 const store = useOperationsStore()
+const businessMetrics = useBusinessMetrics()
 const period = ref('2026-09')
 const conclusionVisible = ref(false)
 const actionVisible = ref(false)
@@ -14,6 +16,7 @@ const conclusionText = ref('')
 const actionForm = reactive({ id: null, action: '', owner: '', department: '', deadline: '', status: '未开始' })
 const report = computed(() => store.reports[period.value])
 const snapshot = computed(() => operationSnapshots[period.value])
+const displayMetrics = computed(() => period.value === '2026-09' ? businessMetrics.currentMetrics.value : snapshot.value.metrics)
 const actionRules = { action: [{ required: true, message: '请输入行动事项', trigger: 'blur' }], owner: [{ required: true, message: '请输入负责人', trigger: 'blur' }], department: [{ required: true, message: '请输入责任部门', trigger: 'blur' }], deadline: [{ required: true, message: '请选择完成期限', trigger: 'change' }] }
 
 function openConclusion() { conclusionText.value = report.value.conclusion; conclusionVisible.value = true }
@@ -47,7 +50,7 @@ function printReport() { window.print() }
     <article class="report-document">
       <header class="report-cover"><div class="report-brand">SMART OPERATIONS</div><h1>{{ report.title }}</h1><p>{{ report.code }}</p><div><span>编制部门：{{ report.preparedBy }}</span><span>编制日期：{{ report.preparedAt }}</span></div></header>
 
-      <section class="report-section"><div class="report-section-title"><span>01</span><div><h2>本期经营概览</h2><p>核心经营结果与目标达成情况</p></div></div><div class="report-metric-row"><div v-for="metric in snapshot.metrics.slice(0, 4)" :key="metric.key"><span>{{ metric.label }}</span><strong>{{ metric.value.toLocaleString() }}<small>{{ metric.unit }}</small></strong><em :class="metric.trend">{{ metric.trend === 'up' ? '提升' : '下降' }} {{ metric.change }}</em></div></div></section>
+      <section class="report-section"><div class="report-section-title"><span>01</span><div><h2>本期经营概览</h2><p>核心经营结果与目标达成情况</p></div></div><div class="report-metric-row"><div v-for="metric in displayMetrics.slice(0, 4)" :key="metric.key"><span>{{ metric.label }}</span><strong>{{ metric.value.toLocaleString() }}<small>{{ metric.unit }}</small></strong><em v-if="metric.live" class="up">实时业务数据</em><em v-else :class="metric.trend">{{ metric.trend === 'up' ? '提升' : '下降' }} {{ metric.change }}</em></div></div></section>
 
       <section class="report-section conclusion-section"><div class="report-section-title"><span>02</span><div><h2>经营结论</h2><p>对本期经营情况的综合判断</p></div><el-button link type="primary" @click="openConclusion"><el-icon><Edit /></el-icon>编辑结论</el-button></div><blockquote>{{ report.conclusion }}</blockquote><div class="report-highlights"><div v-for="(item, index) in report.highlights" :key="item"><b>{{ String(index + 1).padStart(2, '0') }}</b><span>{{ item }}</span></div></div></section>
 

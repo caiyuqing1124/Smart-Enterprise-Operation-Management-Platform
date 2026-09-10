@@ -96,15 +96,25 @@ async function hydrateRouteStores(path) {
   const pending = [appModule.useAppStore().hydrate()]
 
   if (path.startsWith('/workbench/')) {
-    const module = await import('../stores/workbench')
-    pending.push(module.useWorkbenchStore().hydrate())
-    const projectModule = await import('../stores/projects')
-    pending.push(projectModule.useProjectStore().hydrate())
+    const [workbenchModule, projectModule, salesModule, financeModule] = await Promise.all([
+      import('../stores/workbench'), import('../stores/projects'), import('../stores/sales'), import('../stores/finance'),
+    ])
+    pending.push(
+      workbenchModule.useWorkbenchStore().hydrate(),
+      projectModule.useProjectStore().hydrate(),
+      salesModule.useSalesStore().hydrate(),
+      financeModule.useFinanceStore().hydrate(),
+    )
   } else if (path.startsWith('/operations/')) {
-    const module = await import('../stores/operations')
-    pending.push(module.useOperationsStore().hydrate())
-    const projectModule = await import('../stores/projects')
-    pending.push(projectModule.useProjectStore().hydrate())
+    const [operationsModule, projectModule, salesModule, financeModule] = await Promise.all([
+      import('../stores/operations'), import('../stores/projects'), import('../stores/sales'), import('../stores/finance'),
+    ])
+    pending.push(
+      operationsModule.useOperationsStore().hydrate(),
+      projectModule.useProjectStore().hydrate(),
+      salesModule.useSalesStore().hydrate(),
+      financeModule.useFinanceStore().hydrate(),
+    )
   } else if (path.startsWith('/sales/')) {
     const module = await import('../stores/sales')
     pending.push(module.useSalesStore().hydrate())
