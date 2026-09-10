@@ -27,13 +27,13 @@ a { color: var(--primary); text-decoration: none; }
 .brand-mark.large { width: 42px; height: 42px; flex-basis: 42px; padding: 9px; }
 .brand-copy { display: flex; flex-direction: column; gap: 2px; }.brand-copy strong { font-size: 16px; letter-spacing: 1px; }.brand-copy small { font-size: 11px; color: #94a7c5; letter-spacing: 2px; }
 .nav-label { padding: 24px 22px 9px; color: #6f86aa; font-size: 11px; letter-spacing: 2px; }
-.main-menu.el-menu { border: 0; background: transparent; padding: 0 12px; }
+.main-menu.el-menu { min-height: 0; flex: 1; overflow-x: hidden; overflow-y: auto; border: 0; background: transparent; padding: 0 12px; }
 .main-menu .el-menu-item { height: 46px; margin-bottom: 4px; color: #aebcd1; border-radius: 8px; }
 .main-menu .el-menu-item:hover { color: #fff; background: rgba(255,255,255,.07); }
 .main-menu .el-menu-item.is-active { color: #fff; background: linear-gradient(90deg, #246bfd, #347cff); box-shadow: 0 7px 20px rgba(36,107,253,.25); }
-.module-plan { margin: 22px 14px; padding: 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.035); }
+.module-plan { flex: 0 0 auto; margin: 16px 14px; padding: 15px; border: 1px solid rgba(255,255,255,.08); border-radius: 10px; background: rgba(255,255,255,.035); }
 .module-plan-title { display: flex; align-items: center; gap: 7px; font-size: 13px; font-weight: 600; }.module-plan-items { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin: 13px 0; }.module-plan-items span { padding: 6px; color: #aabbd5; font-size: 11px; text-align: center; background: rgba(255,255,255,.06); border-radius: 5px; }.module-plan p { margin: 0; color: #7289ac; font-size: 10px; line-height: 1.6; }
-.collapse-button { display: flex; height: 52px; align-items: center; gap: 10px; margin-top: auto; padding: 0 25px; color: #8fa2bf; border: 0; border-top: 1px solid rgba(255,255,255,.08); background: transparent; cursor: pointer; white-space: nowrap; }.collapse-button:hover { color: #fff; }
+.collapse-button { display: flex; height: 52px; flex: 0 0 52px; align-items: center; gap: 10px; padding: 0 25px; color: #8fa2bf; border: 0; border-top: 1px solid rgba(255,255,255,.08); background: transparent; cursor: pointer; white-space: nowrap; }.collapse-button:hover { color: #fff; }
 .app-main { width: calc(100% - 232px); min-height: 100vh; margin-left: 232px; transition: all .25s ease; }.sidebar.collapsed + .app-main { width: calc(100% - 72px); margin-left: 72px; }
 .topbar { position: sticky; top: 0; z-index: 10; display: flex; height: 72px; align-items: center; justify-content: space-between; padding: 0 28px; border-bottom: 1px solid var(--border); background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
 .topbar-actions { display: flex; align-items: center; gap: 16px; }.global-search { width: 280px; }.global-search .el-input__wrapper { background: #f5f7fa; box-shadow: none; }.action-badge { display: flex; }.user-trigger { display: flex; align-items: center; gap: 9px; padding: 3px; color: #22304a; border: 0; background: transparent; cursor: pointer; }.user-copy { display: flex; min-width: 82px; flex-direction: column; align-items: flex-start; }.user-copy strong { font-size: 13px; }.user-copy small { color: #8a98ab; font-size: 11px; }

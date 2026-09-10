@@ -74,6 +74,8 @@
 .finance-table { font-size: 11px; }
 .finance-table th.el-table__cell { color: #5e6c81; background: #f7f9fc; }
 .finance-table th.el-table__cell, .finance-table td.el-table__cell { padding: 11px 0; }
+.finance-table-actions { display: flex; align-items: center; flex-wrap: nowrap; white-space: nowrap; }
+.finance-table-actions .el-button, .finance-table-actions .el-dropdown { flex: 0 0 auto; }
 .income-amount { color: #159c80; }
 .expense-amount { color: #d47b38; }
 

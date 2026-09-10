@@ -359,7 +359,7 @@ onMounted(() => {
             <el-table-column prop="department" label="归属部门" width="110" />
             <el-table-column prop="owner" label="经办人" width="78" />
             <el-table-column prop="source" label="数据来源" width="88" />
-            <el-table-column label="操作" width="130" fixed="right"><template #default="{ row }"><el-button link type="primary" @click="openDetail(row)">查看</el-button><template v-if="row.source === '手工台账'"><el-button link @click="openEditTransaction(row)">编辑</el-button><el-button link type="danger" @click="removeTransaction(row)">删除</el-button></template></template></el-table-column>
+            <el-table-column label="操作" width="150" fixed="right"><template #default="{ row }"><div class="finance-table-actions"><el-button link type="primary" @click="openDetail(row)">查看</el-button><template v-if="row.source === '手工台账'"><el-button link @click="openEditTransaction(row)">编辑</el-button><el-button link type="danger" @click="removeTransaction(row)">删除</el-button></template></div></template></el-table-column>
           </el-table>
         </el-tab-pane>
 
@@ -382,7 +382,7 @@ onMounted(() => {
             <el-table-column prop="dueDate" label="到期日期" width="110" />
             <el-table-column prop="owner" label="负责人" width="90" />
             <el-table-column label="状态" width="95"><template #default="{ row }"><el-tag :type="statusType(row.status)" size="small">{{ row.status }}</el-tag></template></el-table-column>
-            <el-table-column label="操作" width="175" fixed="right"><template #default="{ row }"><el-button link type="primary" @click="openDetail(row)">查看</el-button><el-button link type="success" :disabled="row.remaining <= 0" @click="openPayment(row)">{{ row.type === '应收' ? '登记回款' : '登记付款' }}</el-button><el-dropdown v-if="row.type === '应付'" trigger="click"><el-button link><el-icon><MoreFilled /></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="openEditPayable(row)">编辑应付</el-dropdown-item><el-dropdown-item divided @click="removePayable(row)">删除应付</el-dropdown-item></el-dropdown-menu></template></el-dropdown></template></el-table-column>
+            <el-table-column label="操作" width="190" fixed="right"><template #default="{ row }"><div class="finance-table-actions"><el-button link type="primary" @click="openDetail(row)">查看</el-button><el-button link type="success" :disabled="row.remaining <= 0" @click="openPayment(row)">{{ row.type === '应收' ? '登记回款' : '登记付款' }}</el-button><el-dropdown v-if="row.type === '应付'" trigger="click"><el-button link><el-icon><MoreFilled /></el-icon></el-button><template #dropdown><el-dropdown-menu><el-dropdown-item @click="openEditPayable(row)">编辑应付</el-dropdown-item><el-dropdown-item divided @click="removePayable(row)">删除应付</el-dropdown-item></el-dropdown-menu></template></el-dropdown></div></template></el-table-column>
           </el-table>
         </el-tab-pane>
       </el-tabs>
