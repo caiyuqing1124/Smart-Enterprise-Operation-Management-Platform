@@ -5,11 +5,13 @@ import { ElMessage, ElMessageBox } from 'element-plus'
 import { useAppStore } from '../stores/app'
 import { useAuthStore } from '../stores/auth'
 import { resetBusinessData } from '../stores/persistence'
+import { useSettingsStore } from '../stores/settings'
 
 const route = useRoute()
 const router = useRouter()
 const appStore = useAppStore()
 const authStore = useAuthStore()
+const settingsStore = useSettingsStore()
 const profileVisible = ref(false)
 const notificationVisible = ref(false)
 const searchKeyword = ref('')
@@ -83,8 +85,8 @@ async function restoreInitialData() {
       <div class="brand">
         <div class="brand-mark"><span></span><span></span><span></span></div>
         <div v-if="!appStore.sidebarCollapsed" class="brand-copy">
-          <strong>智慧企业</strong>
-          <small>运营管理平台</small>
+          <strong>{{ settingsStore.enterpriseProfile.shortName || '智慧企业' }}</strong>
+          <small>{{ settingsStore.systemPreferences.systemName }}</small>
         </div>
       </div>
 
@@ -127,6 +129,11 @@ async function restoreInitialData() {
           <template #title><el-icon><Wallet /></el-icon><span>财务运营</span></template>
           <el-menu-item index="/finance/overview"><el-icon><DataAnalysis /></el-icon>财务概览</el-menu-item>
           <el-menu-item index="/finance/ledger"><el-icon><CreditCard /></el-icon>财务台账</el-menu-item>
+        </el-sub-menu>
+        <el-sub-menu index="settings">
+          <template #title><el-icon><Setting /></el-icon><span>平台设置</span></template>
+          <el-menu-item index="/settings/company"><el-icon><OfficeBuilding /></el-icon>企业与系统设置</el-menu-item>
+          <el-menu-item index="/settings/master-data"><el-icon><Management /></el-icon>组织与基础资料</el-menu-item>
         </el-sub-menu>
       </el-menu>
 
@@ -210,7 +217,7 @@ async function restoreInitialData() {
         <h3>{{ authStore.currentUser?.name }}</h3>
         <p>{{ authStore.currentUser?.role }}</p>
         <el-descriptions :column="1" border>
-          <el-descriptions-item label="所属企业">{{ authStore.currentUser?.companyName }}</el-descriptions-item>
+          <el-descriptions-item label="所属企业">{{ settingsStore.enterpriseProfile.name || authStore.currentUser?.companyName }}</el-descriptions-item>
           <el-descriptions-item label="登录账号">{{ authStore.currentUser?.account }}</el-descriptions-item>
           <el-descriptions-item label="账号状态"><el-tag type="success">正常</el-tag></el-descriptions-item>
         </el-descriptions>

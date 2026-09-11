@@ -2,11 +2,13 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { taskStatuses } from '../../mock/projects'
 import { useProjectStore } from '../../stores/projects'
+import { useSettingsStore } from '../../stores/settings'
 
 const route = useRoute()
 const store = useProjectStore()
+const settingsStore = useSettingsStore()
+const taskStatuses = computed(() => settingsStore.businessDictionaries.taskStatuses)
 const projectId = ref('all')
 const status = ref('all')
 const assigneeId = ref('all')
@@ -22,7 +24,7 @@ const filtered = computed(() => store.tasks.filter((item) => {
   const project = store.projectMap[item.projectId]
   const assignee = store.employeeMap[item.assigneeId]
   const matchKeyword = !keyword.value || `${item.name}${project?.name || ''}${assignee?.name || ''}`.toLowerCase().includes(keyword.value.toLowerCase())
-  return matchKeyword && (projectId.value === 'all' || item.projectId === projectId.value) && (status.value === 'all' || item.status === status.value) && (assigneeId.value === 'all' || item.assigneeId === assigneeId.value)
+  return project && !project.archived && matchKeyword && (projectId.value === 'all' || item.projectId === projectId.value) && (status.value === 'all' || item.status === status.value) && (assigneeId.value === 'all' || item.assigneeId === assigneeId.value)
 }))
 const summary = computed(() => ({ total: filtered.value.length, doing: filtered.value.filter((item) => item.status === '进行中').length, overdue: filtered.value.filter((item) => item.status === '已延期').length, done: filtered.value.filter((item) => item.status === '已完成').length }))
 const boardStatuses = ['未开始', '进行中', '已延期', '已完成']

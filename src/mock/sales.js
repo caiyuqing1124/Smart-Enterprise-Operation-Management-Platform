@@ -62,6 +62,17 @@ export const initialPaymentPlans = [
   { id: 11, contractId: 5, projectId: 6, isAcceptancePayment: true, phase: '治理项目验收款', dueDate: '2027-02-20', amount: 54, paidAmount: 0, paidDate: '', status: '未到期' },
 ]
 
+export const initialPaymentRecords = [
+  { id: 1001, planId: 1, contractId: 1, amount: 176, paidDate: '2026-03-08', remark: '首付款到账' },
+  { id: 1002, planId: 2, contractId: 1, amount: 222, paidDate: '2026-07-28', remark: '阶段款到账' },
+  { id: 1003, planId: 4, contractId: 2, amount: 140, paidDate: '2026-05-14', remark: '首付款到账' },
+  { id: 1004, planId: 5, contractId: 2, amount: 86, paidDate: '2026-08-25', remark: '阶段款部分到账' },
+  { id: 1005, planId: 6, contractId: 2, amount: 60, paidDate: '2026-09-02', remark: '验收款部分到账' },
+  { id: 1006, planId: 7, contractId: 3, amount: 252, paidDate: '2026-08-30', remark: '项目验收款部分到账' },
+  { id: 1007, planId: 8, contractId: 4, amount: 238, paidDate: '2026-08-28', remark: '项目验收款部分到账' },
+  { id: 1008, planId: 9, contractId: 5, amount: 42, paidDate: '2026-09-05', remark: '首付款部分到账' },
+]
+
 export const salesTrend = { months: ['4 月', '5 月', '6 月', '7 月', '8 月', '9 月'], signed: [680, 760, 925, 846, 1085, 1248], paid: [526, 598, 716, 682, 864, 1012], customers: [4, 5, 7, 6, 8, 9] }
 export const salesTeamPerformance = [
   { name: '唐若川', signed: 1286, target: 1500, customers: 18, winRate: 42 },

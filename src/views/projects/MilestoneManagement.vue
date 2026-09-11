@@ -14,7 +14,7 @@ const formRef = ref()
 const mode = ref('create')
 const form = reactive({ id: null, projectId: null, name: '', plannedDate: '', ownerId: null, deliverableText: '', acceptanceStatus: '待提交', isCustomerAcceptance: false })
 const rules = { projectId: [{ required: true, message: '请选择项目', trigger: 'change' }], name: [{ required: true, message: '请输入里程碑名称', trigger: 'blur' }], plannedDate: [{ required: true, message: '请选择计划日期', trigger: 'change' }], ownerId: [{ required: true, message: '请选择负责人', trigger: 'change' }], deliverableText: [{ required: true, message: '请输入交付物', trigger: 'blur' }] }
-const filtered = computed(() => store.milestones.filter((item) => (projectId.value === 'all' || item.projectId === projectId.value) && (status.value === 'all' || item.acceptanceStatus === status.value)).sort((a, b) => a.plannedDate.localeCompare(b.plannedDate)))
+const filtered = computed(() => store.milestones.filter((item) => !store.projectMap[item.projectId]?.archived && (projectId.value === 'all' || item.projectId === projectId.value) && (status.value === 'all' || item.acceptanceStatus === status.value)).sort((a, b) => a.plannedDate.localeCompare(b.plannedDate)))
 const summary = computed(() => ({ total: filtered.value.length, passed: filtered.value.filter((item) => item.acceptanceStatus === '已通过').length, pending: filtered.value.filter((item) => item.acceptanceStatus === '待验收').length, rectifying: filtered.value.filter((item) => item.acceptanceStatus === '整改中').length }))
 
 function reset() { Object.assign(form, { id: null, projectId: projectId.value === 'all' ? null : projectId.value, name: '', plannedDate: '', ownerId: null, deliverableText: '', acceptanceStatus: '待提交', isCustomerAcceptance: false }) }

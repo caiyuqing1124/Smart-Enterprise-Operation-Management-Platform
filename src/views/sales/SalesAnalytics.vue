@@ -2,15 +2,17 @@
 import { computed, ref } from 'vue'
 import { ElMessage } from 'element-plus'
 import BaseChart from '../../components/charts/BaseChart.vue'
-import { customerIndustries, salesTeamPerformance, salesTrend } from '../../mock/sales'
+import { salesTeamPerformance, salesTrend } from '../../mock/sales'
 import { useSalesStore } from '../../stores/sales'
-const store=useSalesStore(),period=ref('year'),region=ref('all'),industry=ref('all'),memberVisible=ref(false),selectedMember=ref(null)
+import { useSettingsStore } from '../../stores/settings'
+const store=useSalesStore(),settingsStore=useSettingsStore(),period=ref('year'),region=ref('all'),industry=ref('all'),memberVisible=ref(false),selectedMember=ref(null)
+const customerIndustries=computed(()=>settingsStore.businessDictionaries.customerIndustries)
 const factor=computed(()=>period.value==='year'?1:period.value==='quarter'?0.29:0.1)
 const scopedCustomers=computed(()=>store.customers.filter(i=>(region.value==='all'||i.region===region.value)&&(industry.value==='all'||i.industry===industry.value)))
 const scopedIds=computed(()=>new Set(scopedCustomers.value.map(i=>i.id))), scopedContracts=computed(()=>store.contracts.filter(i=>scopedIds.value.has(i.customerId))), scopedOpps=computed(()=>store.opportunities.filter(i=>scopedIds.value.has(i.customerId)))
 const totals=computed(()=>({signed:Math.round(scopedContracts.value.reduce((s,i)=>s+i.amount,0)*factor.value),paid:Math.round(scopedContracts.value.reduce((s,i)=>s+i.paid,0)*factor.value),customers:scopedCustomers.value.length,forecast:Math.round(scopedOpps.value.filter(i=>!['赢单','输单'].includes(i.stage)).reduce((s,i)=>s+i.amount*i.probability/100,0))}))
 const trendOption=computed(()=>({color:['#246bfd','#30bea5'],tooltip:{trigger:'axis'},legend:{right:8},grid:{left:50,right:20,top:45,bottom:30},xAxis:{type:'category',data:salesTrend.months,axisTick:{show:false},axisLine:{lineStyle:{color:'#dce4ee'}}},yAxis:{type:'value',splitLine:{lineStyle:{color:'#edf1f6',type:'dashed'}}},series:[{name:'签约金额',type:'bar',barWidth:18,data:salesTrend.signed.map(v=>Math.round(v*factor.value)),itemStyle:{borderRadius:[5,5,0,0]}},{name:'回款金额',type:'line',smooth:true,symbolSize:7,data:salesTrend.paid.map(v=>Math.round(v*factor.value)),lineStyle:{width:3}}]}))
-const industryData=computed(()=>customerIndustries.map(name=>({name,value:scopedContracts.value.filter(c=>store.customerMap[c.customerId]?.industry===name).reduce((s,c)=>s+c.amount,0)})).filter(i=>i.value))
+const industryData=computed(()=>customerIndustries.value.map(name=>({name,value:scopedContracts.value.filter(c=>store.customerMap[c.customerId]?.industry===name).reduce((s,c)=>s+c.amount,0)})).filter(i=>i.value))
 const industryOption=computed(()=>({color:['#246bfd','#35bfa7','#7667e8','#f0a13b','#6e89a9'],tooltip:{trigger:'item',formatter:'{b}<br/>{c} 万元 · {d}%'},legend:{bottom:0,itemWidth:9,itemHeight:9},series:[{type:'pie',radius:['44%','68%'],center:['50%','43%'],label:{show:false},data:industryData.value}]}))
 const funnelStages=['初步接洽','需求确认','方案沟通','商务谈判','合同审批'],funnelOption=computed(()=>({color:['#7d6ce8'],tooltip:{trigger:'axis'},grid:{left:68,right:25,top:15,bottom:22},xAxis:{type:'value',splitLine:{lineStyle:{color:'#edf1f6',type:'dashed'}}},yAxis:{type:'category',data:[...funnelStages].reverse(),axisLine:{show:false},axisTick:{show:false}},series:[{type:'bar',barWidth:17,data:[...funnelStages].reverse().map(s=>scopedOpps.value.filter(i=>i.stage===s).reduce((n,i)=>n+i.amount,0)),itemStyle:{borderRadius:[0,6,6,0]}}]}))
 function openMember(i){selectedMember.value=i;memberVisible.value=true}function exportAnalysis(){const rows=[['销售人员','签约金额','目标金额','客户数','赢单率'],...salesTeamPerformance.map(i=>[i.name,i.signed,i.target,i.customers,`${i.winRate}%`])];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([`\ufeff${rows.map(r=>r.join(',')).join('\n')}`],{type:'text/csv;charset=utf-8'}));a.download='销售分析.csv';a.click();URL.revokeObjectURL(a.href);ElMessage.success('销售分析已导出')}

@@ -68,6 +68,7 @@ import './styles/operations.css'
 import './styles/sales.css'
 import './styles/projects.css'
 import './styles/finance.css'
+import './styles/settings.css'
 
 const app = createApp(App)
 

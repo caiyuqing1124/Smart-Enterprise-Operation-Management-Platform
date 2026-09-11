@@ -81,6 +81,8 @@ const routes = [
       { path: 'projects/:id', name: 'project-detail', component: () => import('../views/projects/ProjectDetail.vue'), meta: { title: '项目详情', group: '项目交付' } },
       { path: 'finance/overview', name: 'finance-overview', component: () => import('../views/finance/FinanceOverview.vue'), meta: { title: '财务概览', group: '财务运营' } },
       { path: 'finance/ledger', name: 'finance-ledger', component: () => import('../views/finance/FinanceLedger.vue'), meta: { title: '财务台账', group: '财务运营' } },
+      { path: 'settings/company', name: 'settings-company', component: () => import('../views/settings/CompanySettings.vue'), meta: { title: '企业与系统设置', group: '平台设置' } },
+      { path: 'settings/master-data', name: 'settings-master-data', component: () => import('../views/settings/MasterDataSettings.vue'), meta: { title: '组织与基础资料', group: '平台设置' } },
     ],
   },
   { path: '/:pathMatch(.*)*', redirect: '/' },
@@ -93,7 +95,8 @@ const router = createRouter({
 
 async function hydrateRouteStores(path) {
   const appModule = await import('../stores/app')
-  const pending = [appModule.useAppStore().hydrate()]
+  const settingsModule = await import('../stores/settings')
+  const pending = [appModule.useAppStore().hydrate(), settingsModule.useSettingsStore().hydrate()]
 
   if (path.startsWith('/workbench/')) {
     const [workbenchModule, projectModule, salesModule, financeModule] = await Promise.all([
@@ -126,6 +129,11 @@ async function hydrateRouteStores(path) {
   } else if (path.startsWith('/finance/')) {
     const [financeModule, projectModule, salesModule] = await Promise.all([import('../stores/finance'), import('../stores/projects'), import('../stores/sales')])
     pending.push(financeModule.useFinanceStore().hydrate(), projectModule.useProjectStore().hydrate(), salesModule.useSalesStore().hydrate())
+  } else if (path.startsWith('/settings/')) {
+    if (path === '/settings/master-data') {
+      const [projectModule, salesModule] = await Promise.all([import('../stores/projects'), import('../stores/sales')])
+      pending.push(projectModule.useProjectStore().hydrate(), salesModule.useSalesStore().hydrate())
+    }
   }
 
   await Promise.all(pending)
@@ -141,7 +149,11 @@ router.beforeEach(async (to) => {
   if (to.meta.public && session && ['login', 'register', 'forgot-password'].includes(to.name)) {
     return { name: 'operations-workbench' }
   }
-  if (!to.meta.public) await hydrateRouteStores(to.path)
+  if (!to.meta.public) {
+    await hydrateRouteStores(to.path)
+    const settingsModule = await import('../stores/settings')
+    document.title = `${to.meta.title || '工作台'} - ${settingsModule.useSettingsStore().systemPreferences.systemName}`
+  }
   return true
 })
 

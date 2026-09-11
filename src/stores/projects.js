@@ -1,6 +1,5 @@
 import { computed, ref, watch } from 'vue'
 import { defineStore } from 'pinia'
-import { deliveryDepartmentId, deliveryEmployees, departments, employees } from '../mock/masterData'
 import {
   initialMilestones,
   initialProjectActivities,
@@ -13,6 +12,7 @@ import {
 import { createBusinessPersistence } from './persistence'
 import { useAppStore } from './app'
 import { useSalesStore } from './sales'
+import { useSettingsStore } from './settings'
 
 const clone = (value) => JSON.parse(JSON.stringify(value))
 const today = () => new Date().toISOString().slice(0, 10)
@@ -24,6 +24,11 @@ function nextCode(list) {
 }
 
 export const useProjectStore = defineStore('projects', () => {
+  const settingsStore = useSettingsStore()
+  const deliveryDepartmentId = 3
+  const employees = computed(() => settingsStore.employees)
+  const departments = computed(() => settingsStore.departments)
+  const deliveryEmployees = computed(() => settingsStore.deliveryEmployees)
   const projects = ref(clone(initialProjects))
   const tasks = ref(clone(initialProjectTasks))
   const milestones = ref(clone(initialMilestones))
@@ -31,8 +36,8 @@ export const useProjectStore = defineStore('projects', () => {
   const allocations = ref(clone(initialResourceAllocations))
   const files = ref(clone(initialProjectFiles))
   const activities = ref(clone(initialProjectActivities))
-  const employeeMap = computed(() => Object.fromEntries(employees.map((item) => [item.id, item])))
-  const departmentMap = computed(() => Object.fromEntries(departments.map((item) => [item.id, item])))
+  const employeeMap = computed(() => Object.fromEntries(employees.value.map((item) => [item.id, item])))
+  const departmentMap = computed(() => Object.fromEntries(departments.value.map((item) => [item.id, item])))
   const projectMap = computed(() => Object.fromEntries(projects.value.map((item) => [item.id, item])))
   const activeProjects = computed(() => projects.value.filter((item) => !item.archived))
   const persistence = createBusinessPersistence(
@@ -73,7 +78,7 @@ export const useProjectStore = defineStore('projects', () => {
     const salesStore = useSalesStore()
     const contract = salesStore.contracts.find((item) => item.id === payload.contractId)
     if (!contract || contract.customerId !== payload.customerId) throw new Error('合同与客户关系不一致')
-    if (!deliveryEmployees.some((item) => item.id === payload.managerId) || payload.memberIds.some((id) => !deliveryEmployees.some((item) => item.id === id))) throw new Error('项目经理和成员只能选择项目交付中心在职员工')
+    if (!deliveryEmployees.value.some((item) => item.id === payload.managerId) || payload.memberIds.some((id) => !deliveryEmployees.value.some((item) => item.id === id))) throw new Error('项目经理和成员只能选择项目交付中心在职员工')
     const item = { id: Date.now(), code: nextCode(projects.value), progress: 0, actualCost: 0, actualStart: '', acceptanceStatus: '待验收', archived: false, ...payload }
     projects.value.unshift(item)
     addActivity(item.id, `创建项目并关联合同 ${contract.code}`, item.managerId)
@@ -83,10 +88,48 @@ export const useProjectStore = defineStore('projects', () => {
   function updateProject(id, payload) {
     const item = projectMap.value[id]
     if (!item) return
-    if (payload.managerId && !deliveryEmployees.some((employee) => employee.id === payload.managerId)) throw new Error('项目经理只能选择项目交付中心在职员工')
-    if (payload.memberIds?.some((id) => !deliveryEmployees.some((employee) => employee.id === id))) throw new Error('项目成员只能选择项目交付中心在职员工')
+    const contract = payload.contractId ? useSalesStore().contracts.find((row) => row.id === payload.contractId) : null
+    if (payload.contractId && (!contract || contract.customerId !== payload.customerId)) throw new Error('合同与客户关系不一致')
+    if (payload.managerId && !deliveryEmployees.value.some((employee) => employee.id === payload.managerId)) throw new Error('项目经理只能选择项目交付中心在职员工')
+    if (payload.memberIds?.some((id) => !deliveryEmployees.value.some((employee) => employee.id === id))) throw new Error('项目成员只能选择项目交付中心在职员工')
     Object.assign(item, payload)
     addActivity(id, '更新项目基础信息')
+  }
+
+  function syncContractProjects(contractId, amount, customerId) {
+    const linkedProjects = projects.value.filter((item) => item.contractId === contractId)
+    if (!linkedProjects.length) return
+    const targetAmount = Math.max(0, Number(amount) || 0)
+    const currentTotal = linkedProjects.reduce((sum, item) => sum + Number(item.contractAmount || 0), 0)
+    let allocatedAmount = 0
+    linkedProjects.forEach((item, index) => {
+      const isLast = index === linkedProjects.length - 1
+      const nextAmount = isLast
+        ? Number((targetAmount - allocatedAmount).toFixed(2))
+        : Number((targetAmount * (currentTotal ? Number(item.contractAmount || 0) / currentTotal : 1 / linkedProjects.length)).toFixed(2))
+      const changed = Number(item.contractAmount || 0) !== nextAmount || item.customerId !== customerId
+      item.contractAmount = nextAmount
+      item.customerId = customerId
+      allocatedAmount += nextAmount
+      if (changed) addActivity(item.id, `合同金额已同步为 ${nextAmount} 万元`)
+    })
+  }
+
+  function reconcileContractProjects() {
+    useSalesStore().contracts.forEach((contract) => {
+      const linkedProjects = projects.value.filter((item) => item.contractId === contract.id)
+      const projectAmount = linkedProjects.reduce((sum, item) => sum + Number(item.contractAmount || 0), 0)
+      const customerMismatch = linkedProjects.some((item) => item.customerId !== contract.customerId)
+      if (linkedProjects.length && (Math.abs(projectAmount - Number(contract.amount || 0)) > 0.001 || customerMismatch)) {
+        syncContractProjects(contract.id, contract.amount, contract.customerId)
+      }
+    })
+  }
+
+  async function hydrate() {
+    await persistence.hydrate()
+    await useSalesStore().hydrate()
+    reconcileContractProjects()
   }
 
   function archiveProject(id) {
@@ -107,10 +150,12 @@ export const useProjectStore = defineStore('projects', () => {
   function updateTask(id, payload) {
     const item = tasks.value.find((row) => row.id === id)
     if (!item) return
+    const previousProjectId = item.projectId
     Object.assign(item, payload)
     if (item.progress >= 100) { item.progress = 100; item.status = '已完成' }
     else if (item.progress > 0 && item.status === '未开始') item.status = '进行中'
     addActivity(item.projectId, `更新任务：${item.name}`, item.assigneeId)
+    if (previousProjectId !== item.projectId) recalculateProject(previousProjectId)
     recalculateProject(item.projectId)
   }
 
@@ -236,8 +281,8 @@ export const useProjectStore = defineStore('projects', () => {
     projects, tasks, milestones, risks, allocations, files, activities,
     employees, departments, deliveryEmployees, deliveryDepartmentId,
     employeeMap, departmentMap, projectMap, activeProjects,
-    hydrate: persistence.hydrate,
-    addProject, updateProject, archiveProject,
+    hydrate,
+    addProject, updateProject, syncContractProjects, archiveProject,
     addTask, updateTask, toggleTaskComplete, removeTask,
     addMilestone, updateMilestone, removeMilestone, submitMilestone, approveMilestone, returnMilestone,
     addRisk, updateRisk, removeRisk, saveAllocation, addFile, removeFile, recalculateProject,

@@ -15,9 +15,12 @@ export const employees = [
   { id: 3007, code: 'YG-0307', name: '韩子墨', departmentId: 3, position: '前端工程师', skills: ['可视化', '交互设计'], status: '在职' },
   { id: 3008, code: 'YG-0308', name: '陆星河', departmentId: 3, position: '测试工程师', skills: ['质量管理', '验收测试'], status: '在职' },
   { id: 2001, code: 'YG-0201', name: '唐若川', departmentId: 2, position: '销售负责人', skills: ['客户经营'], status: '在职' },
+  { id: 2002, code: 'YG-0202', name: '李梓涵', departmentId: 2, position: '高级客户经理', skills: ['新能源行业', '商务谈判'], status: '在职' },
+  { id: 2003, code: 'YG-0203', name: '沈知夏', departmentId: 2, position: '客户经理', skills: ['现代服务', '客户成功'], status: '在职' },
+  { id: 2004, code: 'YG-0204', name: '顾承宇', departmentId: 2, position: '高级客户经理', skills: ['物流行业', '合同管理'], status: '在职' },
+  { id: 2005, code: 'YG-0205', name: '叶青禾', departmentId: 2, position: '客户经理', skills: ['线索培育', '电子信息'], status: '在职' },
   { id: 4001, code: 'YG-0401', name: '程安然', departmentId: 4, position: '财务负责人', skills: ['预算管理'], status: '在职' },
 ]
 
 export const deliveryDepartmentId = 3
 export const deliveryEmployees = employees.filter((item) => item.departmentId === deliveryDepartmentId && item.status === '在职')
-

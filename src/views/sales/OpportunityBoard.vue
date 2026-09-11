@@ -3,13 +3,14 @@ import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import BaseChart from '../../components/charts/BaseChart.vue'
-import { opportunityStages, salesOwners } from '../../mock/sales'
 import { useSalesStore } from '../../stores/sales'
-const route=useRoute(),store=useSalesStore(),view=ref('board'),owner=ref('all'),keyword=ref(''),formVisible=ref(false),detailVisible=ref(false),mode=ref('create'),formRef=ref(),selected=ref(null),draggingId=ref(null)
+import { useSettingsStore } from '../../stores/settings'
+const route=useRoute(),store=useSalesStore(),settingsStore=useSettingsStore(),view=ref('board'),owner=ref('all'),keyword=ref(''),formVisible=ref(false),detailVisible=ref(false),mode=ref('create'),formRef=ref(),selected=ref(null),draggingId=ref(null)
+const opportunityStages=computed(()=>settingsStore.businessDictionaries.opportunityStages),salesOwners=computed(()=>settingsStore.salesOwners)
 const form=reactive({id:null,name:'',customerId:null,amount:0,stage:'初步接洽',probability:20,owner:'',expectedDate:'',nextAction:''}), rules={name:[{required:true,message:'请输入商机名称',trigger:'blur'}],customerId:[{required:true,message:'请选择客户',trigger:'change'}],owner:[{required:true,message:'请选择负责人',trigger:'change'}],expectedDate:[{required:true,message:'请选择预计签约日期',trigger:'change'}]}
 const filtered=computed(()=>store.opportunities.filter(i=>(owner.value==='all'||i.owner===owner.value)&&(!keyword.value||`${i.name}${store.customerMap[i.customerId]?.name}${i.code}`.toLowerCase().includes(keyword.value.toLowerCase()))))
-const activeStages=opportunityStages.filter(i=>!['输单'].includes(i)), totalAmount=computed(()=>filtered.value.filter(i=>!['输单'].includes(i.stage)).reduce((s,i)=>s+i.amount,0))
-const funnelOption=computed(()=>({color:['#246bfd'],tooltip:{trigger:'axis'},grid:{left:80,right:30,top:25,bottom:25},xAxis:{type:'value',splitLine:{lineStyle:{color:'#edf1f6',type:'dashed'}}},yAxis:{type:'category',data:activeStages.map(s=>s),axisLine:{show:false},axisTick:{show:false}},series:[{type:'bar',barWidth:22,data:activeStages.map(s=>filtered.value.filter(i=>i.stage===s).reduce((n,i)=>n+i.amount,0)),itemStyle:{borderRadius:[0,7,7,0],color:'#246bfd'}}]}))
+const activeStages=computed(()=>opportunityStages.value.filter(i=>!['输单'].includes(i))), totalAmount=computed(()=>filtered.value.filter(i=>!['输单'].includes(i.stage)).reduce((s,i)=>s+i.amount,0))
+const funnelOption=computed(()=>({color:['#246bfd'],tooltip:{trigger:'axis'},grid:{left:80,right:30,top:25,bottom:25},xAxis:{type:'value',splitLine:{lineStyle:{color:'#edf1f6',type:'dashed'}}},yAxis:{type:'category',data:activeStages.value,axisLine:{show:false},axisTick:{show:false}},series:[{type:'bar',barWidth:22,data:activeStages.value.map(s=>filtered.value.filter(i=>i.stage===s).reduce((n,i)=>n+i.amount,0)),itemStyle:{borderRadius:[0,7,7,0],color:'#246bfd'}}]}))
 function reset(){Object.assign(form,{id:null,name:'',customerId:null,amount:0,stage:'初步接洽',probability:20,owner:'',expectedDate:'',nextAction:''})}
 function openCreate(customerId=null){reset();form.customerId=customerId;mode.value='create';formVisible.value=true}
 function openEdit(i){Object.assign(form,i);mode.value='edit';formVisible.value=true}
@@ -17,7 +18,7 @@ async function save(){await formRef.value.validate();const p={...form};delete p.
 async function remove(i){try{await ElMessageBox.confirm(`确定删除商机“${i.name}”吗？`,'删除商机',{confirmButtonText:'确定删除',cancelButtonText:'取消',type:'warning'});store.removeOpportunity(i.id);detailVisible.value=false;ElMessage.success('商机已删除')}catch{/* 保留商机。 */}}
 function openDetail(i){selected.value=i;detailVisible.value=true}
 function drop(stage){if(draggingId.value){store.changeOpportunityStage(draggingId.value,stage);ElMessage.success(`商机已移动至“${stage}”阶段`);draggingId.value=null}}
-function stageProbability(){form.probability={初步接洽:20,需求确认:35,方案沟通:55,商务谈判:75,合同审批:90,赢单:100,输单:0}[form.stage]}
+function stageProbability(){form.probability={初步接洽:20,需求确认:35,方案沟通:55,商务谈判:75,合同审批:90,赢单:100,输单:0}[form.stage]??form.probability??50}
 onMounted(()=>{if(route.query.customerId)openCreate(Number(route.query.customerId))})
 </script>
 <template><div class="sales-page opportunity-page"><header class="sales-header"><div><span>SALES PIPELINE</span><h1>商机管理</h1><p>跟踪销售机会阶段、预计金额和下一步行动。</p></div><div><el-radio-group v-model="view"><el-radio-button value="board">看板</el-radio-button><el-radio-button value="table">列表</el-radio-button><el-radio-button value="funnel">漏斗</el-radio-button></el-radio-group><el-button type="primary" @click="openCreate()"><el-icon><Plus /></el-icon>新增商机</el-button></div></header>

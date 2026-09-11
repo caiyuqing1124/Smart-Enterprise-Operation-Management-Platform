@@ -2,14 +2,17 @@
 import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { ElMessage, ElMessageBox } from 'element-plus'
-import { projectHealthStatuses, projectStatuses } from '../../mock/projects'
 import { useProjectStore } from '../../stores/projects'
 import { useSalesStore } from '../../stores/sales'
+import { useSettingsStore } from '../../stores/settings'
 
 const route = useRoute()
 const router = useRouter()
 const store = useProjectStore()
 const salesStore = useSalesStore()
+const settingsStore = useSettingsStore()
+const projectHealthStatuses = computed(() => settingsStore.businessDictionaries.projectHealthStatuses)
+const projectStatuses = computed(() => settingsStore.businessDictionaries.projectStatuses)
 const viewMode = ref('card')
 const keyword = ref('')
 const status = ref('all')

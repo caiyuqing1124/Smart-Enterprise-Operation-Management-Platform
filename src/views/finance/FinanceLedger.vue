@@ -74,28 +74,28 @@ const paymentRules = {
 }
 
 const transactionRows = computed(() => {
-  const receipts = salesStore.paymentPlans
-    .filter((item) => item.paidAmount > 0 && item.paidDate)
-    .map((item) => {
-      const contract = salesStore.contracts.find((contractItem) => contractItem.id === item.contractId)
+  const receipts = salesStore.paymentRecords
+    .map((record) => {
+      const plan = salesStore.paymentPlans.find((item) => item.id === record.planId)
+      const contract = salesStore.contracts.find((contractItem) => contractItem.id === record.contractId)
       const customer = salesStore.customerMap[contract?.customerId]
       return {
-        id: `receipt-${item.id}`,
-        sourceId: item.id,
+        id: `receipt-${record.id}`,
+        sourceId: record.id,
         source: '合同回款',
-        code: `HK-${contract?.code?.split('-').slice(1).join('-')}-${item.id}`,
-        date: item.paidDate,
+        code: `HK-${contract?.code?.split('-').slice(1).join('-')}-${record.id}`,
+        date: record.paidDate,
         direction: '收入',
         category: '合同回款',
-        amount: item.paidAmount,
+        amount: record.amount,
         counterparty: customer?.name || '合同客户',
         customerId: customer?.id,
-        contractId: item.contractId,
-        projectId: item.projectId || null,
+        contractId: record.contractId,
+        projectId: plan?.projectId || null,
         department: '销售管理中心',
         owner: contract?.owner || '',
         status: '已确认',
-        remark: `${contract?.name || ''} · ${item.phase}`,
+        remark: `${contract?.name || ''} · ${plan?.phase || ''} · ${record.remark || '到账'}`,
       }
     })
   const manual = financeStore.transactions.map((item) => ({ ...item, source: item.sourceType === 'payable-payment' ? '应付付款' : '手工台账' }))
