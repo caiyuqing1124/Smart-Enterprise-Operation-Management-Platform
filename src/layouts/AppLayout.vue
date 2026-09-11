@@ -85,7 +85,7 @@ async function restoreInitialData() {
       <div class="brand">
         <div class="brand-mark"><span></span><span></span><span></span></div>
         <div v-if="!appStore.sidebarCollapsed" class="brand-copy">
-          <strong>{{ settingsStore.enterpriseProfile.shortName || '智慧企业' }}</strong>
+          <strong>{{ settingsStore.enterpriseProfile.shortName || '源多艺' }}</strong>
           <small>{{ settingsStore.systemPreferences.systemName }}</small>
         </div>
       </div>

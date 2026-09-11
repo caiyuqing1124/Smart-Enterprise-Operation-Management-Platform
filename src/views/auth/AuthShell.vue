@@ -1,4 +1,6 @@
 <script setup>
+const copyrightYear = new Date().getFullYear()
+
 defineProps({
   title: { type: String, required: true },
   subtitle: { type: String, required: true },
@@ -12,7 +14,10 @@ defineProps({
       <div class="visual-content">
         <div class="visual-brand">
           <div class="brand-mark large"><span></span><span></span><span></span></div>
-          <span>智慧企业运营管理平台</span>
+          <span class="visual-brand-copy">
+            <strong>源多艺</strong>
+            <small>智慧企业运营管理平台</small>
+          </span>
         </div>
         <div class="visual-heading">
           <small>SMART ENTERPRISE OPERATIONS</small>
@@ -28,11 +33,11 @@ defineProps({
     </section>
     <section class="auth-panel">
       <div class="auth-card">
-        <div class="mobile-brand">智慧企业运营管理平台</div>
+        <div class="mobile-brand">源多艺 · 智慧企业运营管理平台</div>
         <header><h2>{{ title }}</h2><p>{{ subtitle }}</p></header>
         <slot />
       </div>
-      <footer>智慧企业运营管理平台 · 企业数字化运营中心</footer>
+      <footer>© {{ copyrightYear }} 福建源多艺科技集团有限公司 版权所有</footer>
     </section>
   </div>
 </template>

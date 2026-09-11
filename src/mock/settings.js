@@ -3,8 +3,8 @@ import { projectHealthStatuses, projectStatuses, taskStatuses } from './projects
 import { customerIndustries, customerLevels, opportunityStages } from './sales'
 
 export const initialEnterpriseProfile = {
-  name: '',
-  shortName: '',
+  name: '福建源多艺科技集团有限公司',
+  shortName: '源多艺',
   industry: '企业服务',
   scale: '200—499 人',
   contact: '',
