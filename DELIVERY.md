@@ -23,6 +23,10 @@
 
 本版本可部署到 Vercel 静态托管，部署参数如下：
 
+- 老板验收地址：<https://smart-enterprise-operation-manageme.vercel.app/>
+- 部署平台：Vercel Hobby
+- 自动部署分支：`main`
+
 - Framework Preset：Vite
 - Install Command：`npm ci`
 - Build Command：`npm run build`
